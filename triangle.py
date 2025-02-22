@@ -1,5 +1,6 @@
 from manim import *
 from utils import *
+from segment import Segment
 
 
 class Triangle:
@@ -13,6 +14,8 @@ class Triangle:
             p3 = Point(scene, name=point_names[2])
 
         self.p1, self.p2, self.p3 = p1, p2, p3
+
+        self.render()
 
     def median(self, point_name, median_point_name=None):
         if all([p.name != point_name for p in (self.p1, self.p2, self.p3)]):
@@ -32,7 +35,8 @@ class Triangle:
             if p.name == point_name:
                 mid2 = p
 
-        #segment = Segment(mid1, mid2)
+        segment = Segment(self.scene, mid2, mid1)
+        segment.render()
 
     def render(self):
         triangle = Polygon(tuple(self.p1), tuple(self.p2), tuple(self.p3), color=RED, fill_opacity=0.5)
@@ -45,6 +49,6 @@ class Triangle:
     def __repr__(self):
         return f'{self.p1.name}{self.p2.name}{self.p3.name}'
 
-    def printPoints(self):
+    def print_points(self):
         for p in self.p1, self.p2, self.p3:
             print(f'{p.name} {p.x} {p.y}')
