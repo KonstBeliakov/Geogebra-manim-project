@@ -2,7 +2,19 @@ from manim import *
 from random import choice, uniform
 
 valid_point_names = [chr(i) for i in range(ord('A'), ord('Z') + 1)]
-point_names = []
+point_names = {}
+
+
+def get_point_by_name(name):
+    if name not in point_names:
+        raise ValueError(f"There is no such point {name}.")
+    return point_names[name]
+
+
+def get_point_or_random(scene, name):
+    if name in point_names:
+        return point_names[name]
+    return Point(scene, name)
 
 
 class Point:
@@ -26,7 +38,7 @@ class Point:
         if name in point_names:
             raise ValueError(f"The name {name} is already in use")
         self.name = name
-        point_names.append(name)
+        point_names[name] = self
         valid_point_names.remove(name)
 
         self.render()

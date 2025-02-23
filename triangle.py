@@ -1,19 +1,19 @@
 from manim import *
 from utils import *
 from segment import Segment
+from point import *
 
 
 class Triangle:
-    def __init__(self, scene, p1=None, p2=None, p3=None, point_names=(None, None, None)):
+    def __init__(self, scene, p1=None, p2=None, p3=None):
         self.scene = scene
 
-        self.scene = scene
-        if p1 is None:
-            p1 = Point(scene, name=point_names[0])
-        if p2 is None:
-            p2 = Point(scene, name=point_names[1])
-        if p3 is None:
-            p3 = Point(scene, name=point_names[2])
+        if isinstance(p1, str) or p1 is None:
+            p1 = get_point_or_random(scene, p1)
+        if isinstance(p2, str) or p2 is None:
+            p2 = get_point_or_random(scene, p2)
+        if isinstance(p3, str) or p3 is None:
+            p3 = get_point_or_random(scene, p3)
 
         self.p1, self.p2, self.p3 = p1, p2, p3
 
@@ -37,6 +37,8 @@ class Triangle:
                 mid2 = p
 
         Segment(self.scene, mid2, mid1)
+
+        return mid1
 
     def render(self):
         self.triangle = always_redraw(lambda: Polygon(tuple(self.p1), tuple(self.p2), tuple(self.p3),
