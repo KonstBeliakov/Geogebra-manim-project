@@ -5,13 +5,19 @@ valid_point_names = [chr(i) for i in range(ord('A'), ord('Z') + 1)]
 point_names = {}
 
 
-def get_point_by_name(name):
+def get_point_by_name(name: str) -> Point:
     if name not in point_names:
         raise ValueError(f"There is no such point {name}.")
     return point_names[name]
 
 
-def get_point_or_random(scene, name):
+def get_point_or_random(scene, name: str) -> Point:
+    """
+    Get a point instance by it's name or generate Point instance with such name if there is no such point
+    :param scene: scene where will be generated a new point
+    :param name: name of the point that we want to get
+    :return: Point that we are searching for
+    """
     if name in point_names:
         return point_names[name]
     return Point(scene, name)
@@ -19,6 +25,13 @@ def get_point_or_random(scene, name):
 
 class Point:
     def __init__(self, scene, name=None, x=None, y=None, get_position=None):
+        """
+        :param scene: scene where to draw a point
+        :param name: name of the point (can use LaTeX)
+        :param x: x coordinate of the point
+        :param y: y coordinate of the point
+        :param get_position: function that produces point coordinates
+        """
         self.scene = scene
 
         self._get_position = get_position
@@ -56,8 +69,6 @@ class Point:
         return self.y_tracker.get_value()
 
     def render(self):
-        self.rendered = True
-
         self.circle = Circle(radius=0.05, color=RED, fill_opacity=1)
         self.circle.move_to((self.x, self.y, 0))
         self.scene.play(Create(self.circle))
@@ -73,6 +84,12 @@ class Point:
         self.scene.add(self.point_name_text)
 
     def move(self, new_x, new_y):
+        """
+        Smoothly moves the point (and all dependent objects)
+        :param new_x: new x coordinate of the point
+        :param new_y: new y coordinate of the point
+        :return:
+        """
         self.scene.play(
             self.x_tracker.animate.set_value(new_x),
             self.y_tracker.animate.set_value(new_y),
@@ -80,6 +97,10 @@ class Point:
         )
 
     def __iter__(self):
+        """
+        We can use a point as list of it's coordinates: ``tuple(point)``
+        :return:
+        """
         yield self.x
         yield self.y
         yield 0

@@ -6,6 +6,12 @@ from point import *
 
 class Triangle:
     def __init__(self, scene, p1=None, p2=None, p3=None):
+        """
+        :param scene: scene where to draw a triangle
+        :param p1: Point instance or name of the point. (If there is no such point it will be created)
+        :param p2: Point instance or name of the point. (If there is no such point it will be created)
+        :param p3: Point instance or name of the point. (If there is no such point it will be created)
+        """
         self.scene = scene
 
         if isinstance(p1, str) or p1 is None:
@@ -20,6 +26,12 @@ class Triangle:
         self.render()
 
     def median(self, point_name, median_point_name=None):
+        """
+        Draw a median in the triangle
+        :param point_name: name of the point from which we want to draw a median
+        :param median_point_name: name of the intersection point of the median with the side (to be created)
+        :return: intersection point of the median with the side
+        """
         if all([p.name != point_name for p in (self.p1, self.p2, self.p3)]):
             raise ValueError(f"There is no vertex {point_name} in the triangle {self}")
 

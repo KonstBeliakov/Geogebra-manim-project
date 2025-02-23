@@ -4,6 +4,11 @@ from point import *
 
 class Segment:
     def __init__(self, scene, p1=None, p2=None):
+        """
+        :param scene: scene where to draw the segment
+        :param p1: Point instance or name of the point. (If there is no such point it will be created)
+        :param p2: Point instance or name of the point. (If there is no such point it will be created)
+        """
         self.scene = scene
 
         if isinstance(p1, str) or p1 is None:
@@ -20,10 +25,23 @@ class Segment:
         self.line = always_redraw(lambda: Line(tuple(self.p1), tuple(self.p2), color=RED))
         self.scene.play(Create(self.line))
 
-    def middle(self, name=None):
-        return Point(self.scene, name=name, get_position=lambda: ((self.p1.x + self.p2.x) / 2, (self.p1.y + self.p2.y) / 2))
+    def middle(self, middle_point_name=None):
+        """
+        Draw the middle of the segment
+        :param middle_point_name: name of the middle point that will be created
+        :return: middle point
+        """
+        return Point(self.scene, name=middle_point_name,
+                     get_position=lambda: ((self.p1.x + self.p2.x) / 2, (self.p1.y + self.p2.y) / 2))
 
     def intersect(self, other, pointName=None):
+        """
+        Draw the intersection of two segments
+        :param other: the segment with which we want to find the intersection point
+        :param pointName: name of the point of the intersection
+        :return: Point of the intersection
+        """
+
         def get_position(segment1, segment2):
             x1, y1 = segment1.p1.x, segment1.p1.y
             x2, y2 = segment1.p2.x, segment1.p2.y
