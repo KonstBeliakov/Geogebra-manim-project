@@ -18,7 +18,7 @@ def get_point_or_random(scene, name):
 
 
 class Point:
-    def __init__(self, scene, x=None, y=None, get_position=None, name=None):
+    def __init__(self, scene, name=None, x=None, y=None, get_position=None):
         self.scene = scene
 
         self._get_position = get_position

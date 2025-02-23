@@ -1,23 +1,17 @@
 from manim import *
-from triangle import Triangle
 from point import Point
 from segment import Segment
 
 
 class Main(Scene):
     def construct(self):
-        A = Point(self, 0, 0, name='A')
-        B = Point(self, 2, 0, name='B')
-        C = Point(self, 0, 2, name='C')
+        A = Point(self, 'A', 0, 0)
+        Point(self, 'B', 1, 1)
 
-        t = Triangle(self, A, B, C)
-        D = t.median('A', 'D')
+        # We can create a segment using existing points or their names
+        s1 = Segment(self, A, 'B')
 
-        E = Point(self, 2, 3, name='E')
-        t2 = Triangle(self, 'A', D, 'E')
+        # If points are not specified, they will be generated randomly
+        s2 = Segment(self)
 
-        A.move(2, 2)
-
-        CE = Segment(self, 'C', 'E')
-
-        self.wait(2)
+        self.wait(1)
