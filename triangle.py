@@ -1,12 +1,11 @@
 from manim import *
 from utils import *
 from segment import Segment
-from object import Object
 
 
-class Triangle(Object):
+class Triangle:
     def __init__(self, scene, p1=None, p2=None, p3=None, point_names=(None, None, None)):
-        super().__init__(scene)
+        self.scene = scene
 
         self.scene = scene
         if p1 is None:
@@ -17,10 +16,6 @@ class Triangle(Object):
             p3 = Point(scene, name=point_names[2])
 
         self.p1, self.p2, self.p3 = p1, p2, p3
-
-        self.p1.add_dependent(self)
-        self.p2.add_dependent(self)
-        self.p3.add_dependent(self)
 
         self.render()
 
@@ -44,12 +39,10 @@ class Triangle(Object):
         Segment(self.scene, mid2, mid1)
 
     def render(self):
-        self.triangle = Polygon(tuple(self.p1), tuple(self.p2), tuple(self.p3), color=RED, fill_opacity=0.3)
+        self.triangle = always_redraw(lambda: Polygon(tuple(self.p1), tuple(self.p2), tuple(self.p3),
+                                                      color=RED,
+                                                      fill_opacity=0.3))
         self.scene.play(Create(self.triangle))
-
-        for p in self.p1, self.p2, self.p3:
-            p.render()
-            self.scene.wait(0.2)
 
     def __repr__(self):
         return f'{self.p1.name}{self.p2.name}{self.p3.name}'
@@ -57,8 +50,3 @@ class Triangle(Object):
     def print_points(self):
         for p in self.p1, self.p2, self.p3:
             print(f'{p.name} {p.x} {p.y}')
-
-    def transform(self):
-        triangle2 = Polygon(tuple(self.p1), tuple(self.p2), tuple(self.p3), color=RED, fill_opacity=0.3)
-        self.scene.play(ReplacementTransform(self.triangle, triangle2))
-        self.triangle = triangle2

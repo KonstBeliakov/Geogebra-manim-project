@@ -1,84 +1,73 @@
 from manim import *
 from random import choice, uniform
-from object import Object
-
 
 valid_point_names = [chr(i) for i in range(ord('A'), ord('Z') + 1)]
 point_names = []
 
 
-class Point(Object):
+class Point:
     def __init__(self, scene, x=None, y=None, get_position=None, name=None):
-        self.rendered = False
-        super().__init__(scene)
+        self.scene = scene
 
-        self.get_positionLambda = get_position
-
-        if self.get_positionLambda is not None:
-            self.x, self.y = self.get_positionLambda()
+        self._get_position = get_position
+        if self._get_position is not None:
+            x, y = self._get_position()
         else:
             if x is None:
                 x = uniform(-3, 3)
             if y is None:
                 y = uniform(-3, 3)
 
-            self.x, self.y = x, y
+        self.x_tracker = ValueTracker(x)
+        self.y_tracker = ValueTracker(y)
 
-
-
-        # if name of the point was not specified, we choose random name
         if name is None:
             name = choice(valid_point_names)
-
         if name in point_names:
-            raise Exception(f"The name {name} is already in use")
-
+            raise ValueError(f"The name {name} is already in use")
         self.name = name
         point_names.append(name)
         valid_point_names.remove(name)
 
         self.render()
 
-    def __getattribute__(self, item):
-        if item in ('x', 'y'):
-            get_position = object.__getattribute__(self, 'get_positionLambda')
-            if get_position is not None:
-                pos = get_position()
-                return pos[0] if item == 'x' else pos[1]
-        return object.__getattribute__(self, item)
+    @property
+    def x(self):
+        if self._get_position is not None:
+            return self._get_position()[0]
+        return self.x_tracker.get_value()
+
+    @property
+    def y(self):
+        if self._get_position is not None:
+            return self._get_position()[1]
+        return self.y_tracker.get_value()
+
+    def render(self):
+        self.rendered = True
+
+        self.circle = Circle(radius=0.05, color=RED, fill_opacity=1)
+        self.circle.move_to((self.x, self.y, 0))
+        self.scene.play(Create(self.circle))
+        self.scene.wait(0.3)
+        self.circle.add_updater(lambda m: m.move_to((self.x, self.y, 0)))
+        self.scene.add(self.circle)
+
+        self.point_name_text = Text(self.name, font_size=30)
+        self.point_name_text.move_to((self.x, self.y + 0.3, 0))
+        self.scene.play(Write(self.point_name_text))
+        self.scene.wait(0.3)
+        self.point_name_text.add_updater(lambda m: m.move_to((self.x, self.y + 0.3, 0)))
+        self.scene.add(self.point_name_text)
+
+    def move(self, new_x, new_y):
+        self.scene.play(
+            self.x_tracker.animate.set_value(new_x),
+            self.y_tracker.animate.set_value(new_y),
+            run_time=2
+        )
 
     def __iter__(self):
         yield self.x
         yield self.y
         yield 0
-
-    def render(self):
-        if not self.rendered:
-            self.rendered = True
-
-            self.circle = Circle(radius=0.05, color=RED, fill_opacity=1)
-            self.circle.move_to((self.x, self.y, 0))
-            self.scene.play(Create(self.circle))
-
-            self.point_name_text = Text(self.name, font_size=30)
-            self.point_name_text.move_to((self.x, self.y + 0.3, 0))
-            self.scene.play(Write(self.point_name_text))
-
-    def transform(self):
-        circle2 = Circle(radius=0.05, color=RED, fill_opacity=1)
-        circle2.move_to((self.x, self.y, 0))
-
-        self.scene.play(Transform(self.circle, circle2))
-        self.circle = circle2
-
-        point_name_text2 = Text(self.name, font_size=30)
-        point_name_text2.move_to((self.x, self.y + 0.3, 0))
-        self.scene.play(Transform(self.point_name_text, point_name_text2))
-
-        self.point_name_text = point_name_text2
-
-    def move(self, new_x, new_y):
-        self.x = new_x
-        self.y = new_y
-
-        self.update()
