@@ -1,13 +1,16 @@
 from manim import *
 from random import choice, uniform
+from object import Object
+
 
 valid_point_names = [chr(i) for i in range(ord('A'), ord('Z') + 1)]
 point_names = []
 
 
-class Point:
+class Point(Object):
     def __init__(self, scene, x=None, y=None, get_position=None, name=None):
-        self.scene = scene
+        self.rendered = False
+        super().__init__(scene)
 
         self.get_positionLambda = get_position
 
@@ -21,7 +24,7 @@ class Point:
 
             self.x, self.y = x, y
 
-        self.rendered = False
+
 
         # if name of the point was not specified, we choose random name
         if name is None:
@@ -33,6 +36,8 @@ class Point:
         self.name = name
         point_names.append(name)
         valid_point_names.remove(name)
+
+        self.render()
 
     def __getattribute__(self, item):
         if item in ('x', 'y'):
@@ -51,10 +56,29 @@ class Point:
         if not self.rendered:
             self.rendered = True
 
-            circle = Circle(radius=0.05, color=RED, fill_opacity=1)
-            circle.move_to((self.x, self.y, 0))
-            self.scene.play(Create(circle))
+            self.circle = Circle(radius=0.05, color=RED, fill_opacity=1)
+            self.circle.move_to((self.x, self.y, 0))
+            self.scene.play(Create(self.circle))
 
-            point_name_text = Text(self.name, font_size=30)
-            point_name_text.move_to((self.x, self.y + 0.3, 0))
-            self.scene.play(Write(point_name_text))
+            self.point_name_text = Text(self.name, font_size=30)
+            self.point_name_text.move_to((self.x, self.y + 0.3, 0))
+            self.scene.play(Write(self.point_name_text))
+
+    def transform(self):
+        circle2 = Circle(radius=0.05, color=RED, fill_opacity=1)
+        circle2.move_to((self.x, self.y, 0))
+
+        self.scene.play(Transform(self.circle, circle2))
+        self.circle = circle2
+
+        point_name_text2 = Text(self.name, font_size=30)
+        point_name_text2.move_to((self.x, self.y + 0.3, 0))
+        self.scene.play(Transform(self.point_name_text, point_name_text2))
+
+        self.point_name_text = point_name_text2
+
+    def move(self, new_x, new_y):
+        self.x = new_x
+        self.y = new_y
+
+        self.update()
