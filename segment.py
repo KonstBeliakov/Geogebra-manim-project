@@ -1,5 +1,6 @@
 from manim import *
 from point import *
+from settings import *
 
 
 class Segment:
@@ -22,7 +23,7 @@ class Segment:
         self.render()
 
     def render(self):
-        self.line = always_redraw(lambda: Line(tuple(self.p1), tuple(self.p2), color=RED))
+        self.line = always_redraw(lambda: Line(tuple(self.p1), tuple(self.p2), color=LINES_COLOR))
         self.scene.play(Create(self.line))
 
     def middle(self, middle_point_name=None):

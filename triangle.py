@@ -4,6 +4,7 @@ from manim import *
 from utils import *
 from segment import Segment
 from point import *
+from settings import *
 
 
 class Triangle:
@@ -105,8 +106,8 @@ class Triangle:
 
     def render(self):
         self.triangle = always_redraw(lambda: Polygon(tuple(self.p1), tuple(self.p2), tuple(self.p3),
-                                                      color=RED,
-                                                      fill_opacity=0.3))
+                                                      color=LINES_COLOR,
+                                                      fill_opacity=FIGURE_FILL_OPACITY))
         self.scene.play(Create(self.triangle))
 
     def __repr__(self):

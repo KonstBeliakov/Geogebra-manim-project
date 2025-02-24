@@ -1,0 +1,4 @@
+import manim
+
+LINES_COLOR = manim.BLUE
+FIGURE_FILL_OPACITY = 0.1

@@ -1,5 +1,7 @@
 from manim import *
 from random import choice, uniform
+from settings import *
+
 
 valid_point_names = [chr(i) for i in range(ord('A'), ord('Z') + 1)]
 point_names = {}
@@ -71,7 +73,7 @@ class Point:
         return self.y_tracker.get_value()
 
     def render(self):
-        self.circle = Circle(radius=0.05, color=RED, fill_opacity=1)
+        self.circle = Circle(radius=0.05, color=LINES_COLOR, fill_opacity=1)
         self.circle.move_to((self.x, self.y, 0))
         self.scene.play(Create(self.circle))
         self.scene.wait(0.3)
