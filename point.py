@@ -52,7 +52,9 @@ class Point:
             raise ValueError(f"The name {name} is already in use")
         self.name = name
         point_names[name] = self
-        valid_point_names.remove(name)
+
+        if name in valid_point_names:
+            valid_point_names.remove(name)
 
         self.render()
 

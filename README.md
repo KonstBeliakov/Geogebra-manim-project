@@ -1,4 +1,5 @@
-
+# Geometry in manim
+Implementation of the main Geogebra methods in the python manim library
 ### Triangles
 Creating triangles:
 ```python
@@ -22,6 +23,19 @@ class Main(Scene):
         # we can specify only some of the points, and remaining will be generated (with random names)
         Triangle(self, 'D')
         
+        self.wait(1)
+```
+Example of usage of methods of `Triangle`:
+```python
+from manim import *
+from triangle import Triangle
+
+
+class Main(Scene):
+    def construct(self):
+        t = Triangle(self, 'A1', 'B1', 'C1')
+        t.bisector('A1', 'B')
+        t.median('A1', 'M')
         self.wait(1)
 ```
 ### Segments
