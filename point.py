@@ -13,7 +13,7 @@ def get_point_by_name(name: str) -> Point:
     return point_names[name]
 
 
-def get_point_or_random(scene, name: str) -> Point:
+def get_point_or_random(scene, name: str | None) -> Point:
     """
     Get a point instance by it's name or generate Point instance with such name if there is no such point
     :param scene: scene where will be generated a new point
