@@ -16,6 +16,9 @@ def draw_point(scene, name, x, y, z):
     scene.play(Write(point_name_text))
 
 
+operations = []
+
+
 def parse(element: ET.Element, scene):
     for obj_child in element:
         parse(obj_child, scene)
@@ -28,6 +31,29 @@ def parse(element: ET.Element, scene):
                                y=float(child.get('y')),
                                z=float(child.get('z'))
                                )
+    # ....
+    #    color = get_color()
+    #    operations.append(f"{draw_bisector.__name__}('{trianle_name}', {if color is not None "color={color}" else "")")
+    #...
+    #    draw_median()
+    #...
+    #    operations.append(f"{draw_point_on_circle.__name__}('{circle_name}', '{point_name}')")
+
+    #...
+    #    operations.append(f"{animate.__name__}('A')")
+def to_code():
+    with open('code.py', 'w', encoding='utf-8') as file:
+        file.write(f"""
+from manim import *
+from utils import *
+
+
+class Main(Scene):
+    def construct(self):
+        init(scene=self)
+    {'\t\t\n'.join(operations)}""")
+
+#operations.append('move_something()')
 
 
 class TrilliumScene(Scene):
