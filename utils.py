@@ -36,6 +36,30 @@ def get_bisector_position(vertex, A, B):
     return xD, yD
 
 
+def get_altitude_position(vertex, A, B):
+    # vector AB
+    ABx = B.x - A.x
+    ABy = B.y - A.y
+
+    denom = ABx * ABx + ABy * ABy
+    if denom == 0:
+        return A.x, A.y
+
+    # vector AV
+    AVx = vertex.x - A.x
+    AVy = vertex.y - A.y
+
+    # product of AV and AB
+    dotAV_AB = AVx * ABx + AVy * ABy
+
+    t = dotAV_AB / denom
+
+    xH = A.x + t * ABx
+    yH = A.y + t * ABy
+
+    return xH, yH
+
+
 _scene = None
 
 
@@ -60,7 +84,8 @@ def median(triangle: str, segment_name: str):
         segment_name = segment_name[::-1]
 
     p1 = get_point_by_name(segment_name[0])
-    p2 = midPoint(_scene, *[get_point_by_name(i) for i in triangle if i not in segment_name], name=segment_name[1])
+    A, B = [get_point_by_name(i) for i in triangle if i not in segment_name]
+    p2 = midPoint(_scene, A, B, name=segment_name[1])
 
     Segment(_scene, p1, p2)
     return p2
@@ -82,8 +107,18 @@ def bisector(triangle: str, segment_name: str):
 
 
 @on_scene
-def height(triangle: str, point_name: str):
-    pass
+def height(triangle: str, segment_name: str):
+    if segment_name[0] not in triangle:
+        segment_name = segment_name[::-1]
+
+    p1 = get_point_by_name(segment_name[0])
+    A, B = [get_point_by_name(i) for i in triangle if i not in segment_name]
+
+    p2 = Point(_scene, name=segment_name[1], get_position=lambda: get_altitude_position(p1, A, B))
+
+    Segment(_scene, p1, p2)
+
+    return p2
 
 
 @on_scene

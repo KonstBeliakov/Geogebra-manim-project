@@ -10,6 +10,7 @@ class Main(Scene):
 
         median('ABC', "BM")
         bisector('ABC', 'BD')
+        height('ABC', 'AH')
 
         move_randomly('A')
         move_randomly('B')
