@@ -1,3 +1,6 @@
+import math
+from random import uniform
+
 from point import Point, get_point_by_name
 from functools import update_wrapper
 
@@ -7,6 +10,30 @@ import triangle as tr
 
 def midPoint(scene, p1: Point, p2: Point, name=None):
     return Point(scene, get_position=lambda: ((p1.x + p2.x) / 2, (p1.y + p2.y) / 2), name=name)
+
+
+def get_bisector_position(vertex, A, B):
+    """
+    A function that will calculate the coordinates of the intersection of the bisector
+    from 'vertex' with the side AB (points A and B) using the formula:
+      BD/DC = vertexA / vertexB
+    where D is the desired point on side AB.
+    """
+    distA = math.hypot(vertex.x - A.x, vertex.y - A.y)
+    distB = math.hypot(vertex.x - B.x, vertex.y - B.y)
+
+    # If the triangle is degenerate or distA + distB = 0, return one of the vertices
+    if distA + distB == 0:
+        return A.x, A.y
+
+    # Parameter t defining the position of point D on AB
+    # D = A + t*(B - A)
+    t = distA / (distA + distB)
+
+    # Calculate the coordinates of point D
+    xD = A.x + t * (B.x - A.x)
+    yD = A.y + t * (B.y - A.y)
+    return xD, yD
 
 
 _scene = None
@@ -21,7 +48,6 @@ def on_scene(func):
     def wrapper(*args, **kwargs):
         if _scene is None:
             raise Exception(f"Need scene to use function {func.__name__}")
-        print(f'func: {func.__name__}\nargs: {args}\nkwargs: {kwargs}')
         return func(*args, **kwargs)
 
     update_wrapper(wrapper, func)
@@ -29,20 +55,31 @@ def on_scene(func):
 
 
 @on_scene
-def median(triangle: str, point_name: str):
-    pass
+def median(triangle: str, segment_name: str):
+    if segment_name[0] not in triangle:
+        segment_name = segment_name[::-1]
+
+    p1 = get_point_by_name(segment_name[0])
+    p2 = midPoint(_scene, *[get_point_by_name(i) for i in triangle if i not in segment_name], name=segment_name[1])
+
+    Segment(_scene, p1, p2)
+    return p2
 
 
 @on_scene
 def bisector(triangle: str, segment_name: str):
-    p1_name, p2_name, p3_name = triangle
+    if segment_name[0] not in triangle:
+        segment_name = segment_name[::-1]
 
-    p1 = get_point_by_name(p1_name)
-    p2 = get_point_by_name(p2_name)
-    p3 = get_point_by_name(p3_name)
+    p1 = get_point_by_name(segment_name[0])
+    A, B = [get_point_by_name(i) for i in triangle if i not in segment_name]
 
-    t = tr.Triangle(_scene, p1, p2, p3)
-    t.bisector(segment_name[0], segment_name[1])
+    p2 = Point(_scene, name=segment_name[1], get_position=lambda: get_bisector_position(p1, A, B))
+
+    Segment(_scene, p1, p2)
+
+    return p2
+
 
 @on_scene
 def height(triangle: str, point_name: str):
@@ -87,3 +124,13 @@ def intersect(segment1: str, segment2: str, point_name=None):
     s2 = Segment(_scene, p3_name, p4_name)
 
     return s1.intersect(s2, pointName=point_name)
+
+
+@on_scene
+def move(pointName, x, y, run_time=2):
+    get_point_by_name(pointName).move(x, y, run_time)
+
+
+@on_scene
+def move_randomly(pointName, run_time=2):
+    move(pointName, uniform(-3, 3), uniform(-3, 3), run_time)

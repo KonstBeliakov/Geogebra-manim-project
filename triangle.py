@@ -3,6 +3,7 @@ import math
 from manim import *
 from utils import *
 from segment import Segment
+import circle
 from point import *
 from settings import *
 
@@ -28,81 +29,41 @@ class Triangle:
 
         self.render()
 
-    def median(self, point_name, median_point_name=None):
+    def circumscribed_circle(self, point_name=None):
         """
-        Draw a median in the triangle
-        :param point_name: name of the vertex from which we want to draw a median
-        :param median_point_name: name of the intersection point of the median with the side (to be created)
-        :return: intersection point of the median with the side
+        Drawing the circumscribes circle of the triangle
+        :param point_name: optional name of the center of the circle
+        :return: Circle -- circumscribed circle of the triangle
         """
-        vertices = [self.p1, self.p2, self.p3]
 
-        vertex = None
-        for p in self.p1, self.p2, self.p3:
-            if p.name == point_name:
-                vertex = p
-        if vertex is None:
-            raise ValueError(f"There is no vertex {point_name} in the triangle {self}")
+        def get_circumscribed_center_position(triangle):
+            x1, y1 = triangle.p1.x, triangle.p1.y
+            x2, y2 = triangle.p2.x, triangle.p2.y
+            x3, y3 = triangle.p3.x, triangle.p3.y
 
-        side_vertices = [p for p in vertices if p.name != point_name]
+            D = 2 * (x1 * (y2 - y3) + x2 * (y3 - y1) + x3 * (y1 - y2))
 
-        intersection_point = midPoint(self.scene, side_vertices[0], side_vertices[1], name=median_point_name)
+            if abs(D) < 1e-9:
+                raise ValueError(
+                    f"Triangle {triangle} is degenerate or the points are collinear - cannot define a circumscribed circle.")
 
-        Segment(self.scene, vertex, intersection_point)
+            Ux = ((x1 ** 2 + y1 ** 2) * (y2 - y3) +
+                  (x2 ** 2 + y2 ** 2) * (y3 - y1) +
+                  (x3 ** 2 + y3 ** 2) * (y1 - y2)) / D
 
-        return intersection_point
+            Uy = ((x1 ** 2 + y1 ** 2) * (x3 - x2) +
+                  (x2 ** 2 + y2 ** 2) * (x1 - x3) +
+                  (x3 ** 2 + y3 ** 2) * (x2 - x1)) / D
 
-    def bisector(self, vertex_name, intersection_point_name=None):
-        """
-        Draw the bisector from the vertex ``vertex_name`` and return the intersection point with the opposite side.
-        :param vertex_name: name of the vertex (one of p1, p2, p3)
-        :param intersection_point_name: optional name for the intersection point
-        :return: Point -- the intersection point of the bisector with the opposite side
-        """
-        vertices = [self.p1, self.p2, self.p3]
-        vertex = None
-        for v in vertices:
-            if v.name == vertex_name:
-                vertex = v
-                break
-        if vertex is None:
-            raise ValueError(f"There is no vertex {vertex_name} in the triangle {self}")
+            r = math.sqrt((x1 - Ux) ** 2 + (y1 - Uy) ** 2)
 
-        # vertices on the side where the bisector intersects
-        A, B = [p for p in vertices if p != vertex]
+            return (Ux, Uy), r
 
-        def get_bisector_position():
-            """
-            A function that will calculate the coordinates of the intersection of the bisector
-            from 'vertex' with the side AB (points A and B) using the formula:
-              BD/DC = vertexA / vertexB
-            where D is the desired point on side AB.
-            """
-            distA = math.hypot(vertex.x - A.x, vertex.y - A.y)
-            distB = math.hypot(vertex.x - B.x, vertex.y - B.y)
+        center = Point(self.scene, name=point_name, get_position=lambda: get_circumscribed_center_position(self))
 
-            # If the triangle is degenerate or distA + distB = 0, return one of the vertices
-            if distA + distB == 0:
-                return A.x, A.y
+        circ_circle = circle.Circle(self.scene, center, get_circumscribed_center_position(self)[1])
 
-            # Parameter t defining the position of point D on AB
-            # D = A + t*(B - A)
-            t = distA / (distA + distB)
-
-            # Calculate the coordinates of point D
-            xD = A.x + t * (B.x - A.x)
-            yD = A.y + t * (B.y - A.y)
-            return xD, yD
-
-        intersection_point = Point(
-            self.scene,
-            name=intersection_point_name,
-            get_position=get_bisector_position
-        )
-
-        Segment(self.scene, vertex, intersection_point)
-
-        return intersection_point
+        return circ_circle
 
     def render(self):
         self.triangle = always_redraw(lambda: Polygon(tuple(self.p1), tuple(self.p2), tuple(self.p3),

@@ -1,6 +1,4 @@
 from manim import *
-from triangle import Triangle
-import point
 from utils import *
 
 
@@ -13,6 +11,13 @@ class Main(Scene):
         median('ABC', "BM")
         bisector('ABC', 'BD')
 
-        points(('E', -1, -1), ('F', 1, 1), ('G', -1, 1), ('I', 1, -1), 'U')
+        move_randomly('A')
+        move_randomly('B')
+        move_randomly('C')
 
-        intersect('EF', 'GI', 'X')
+        #points(('E', -1, -1), ('F', 1, 1), ('G', -1, 1), ('I', 1, -1), 'U')
+
+        #intersect('EF', 'GI', 'X')
+
+        #move('E', -2, -1.2, run_time=0.5)
+        #move_randomly('F', run_time=0.5)

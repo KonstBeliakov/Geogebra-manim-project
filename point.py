@@ -87,7 +87,7 @@ class Point:
         self.point_name_text.add_updater(lambda m: m.move_to((self.x, self.y + 0.3, 0)))
         self.scene.add(self.point_name_text)
 
-    def move(self, new_x, new_y):
+    def move(self, new_x, new_y, run_time=2):
         """
         Smoothly moves the point (and all dependent objects)
         :param new_x: new x coordinate of the point
@@ -97,7 +97,7 @@ class Point:
         self.scene.play(
             self.x_tracker.animate.set_value(new_x),
             self.y_tracker.animate.set_value(new_y),
-            run_time=2
+            run_time=run_time
         )
 
     def __iter__(self):
