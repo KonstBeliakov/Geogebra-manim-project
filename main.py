@@ -1,15 +1,18 @@
-from manim import Scene
-from point import Point
-from circle import Circle
+from manim import *
+from triangle import Triangle
+import point
+from utils import *
 
 
 class Main(Scene):
     def construct(self):
-        A = Point(self, 'A', 0, 0)
+        init(scene=self)
 
-        Circle(self, 'A')
+        triangle('ABC')
 
-        # The circle moves when we move its center
-        A.move(1, 1)
+        median('ABC', "BM")
+        bisector('ABC', 'BD')
 
-        self.wait(1)
+        points(('E', -1, -1), ('F', 1, 1), ('G', -1, 1), ('I', 1, -1), 'U')
+
+        intersect('EF', 'GI', 'X')
