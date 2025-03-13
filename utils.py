@@ -1,6 +1,10 @@
 import math
 from random import uniform
+from math import *
 
+from manim import TAU
+
+from circle import Circle
 from point import Point, get_point_by_name
 from functools import update_wrapper
 
@@ -152,6 +156,11 @@ def triangle(pointNames: str):
 
 
 @on_scene
+def circle(center=None, r=1):
+    return Circle(_scene, center=center, r=r)
+
+
+@on_scene
 def segment(pointNames: str):
     return Segment(_scene, pointNames[0], pointNames[1])
 
@@ -194,3 +203,22 @@ def move(pointName, x, y, run_time=2):
 @on_scene
 def move_randomly(pointName, run_time=2):
     move(pointName, uniform(-3, 3), uniform(-3, 3), run_time)
+
+
+@on_scene
+def move_along_circle(pointName, circle, run_time=4):
+    p = get_point_by_name(pointName)
+    p.move_along_circle(circle,
+                        run_time=run_time,
+                        angle=TAU)
+
+
+@on_scene
+def point_on_circle(circle, pointName=None):
+    cx, cy = circle.center.x, circle.center.y
+
+    angle = uniform(0, TAU)
+    x = cx + circle.r * cos(angle)
+    y = cy + circle.r * sin(angle)
+
+    return Point(_scene, name=pointName, x=x, y=y)

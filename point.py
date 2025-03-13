@@ -2,7 +2,6 @@ from manim import *
 from random import choice, uniform
 from settings import *
 
-
 valid_point_names = [chr(i) for i in range(ord('A'), ord('Z') + 1)]
 point_names = {}
 
@@ -99,6 +98,21 @@ class Point:
             self.y_tracker.animate.set_value(new_y),
             run_time=run_time
         )
+
+    def move_along_circle(self, circle, run_time=4, start_angle=None, angle=TAU):
+        center = circle.center
+        r = circle.r
+
+        if start_angle is None:
+            start_angle = np.arctan2(self.y - center.y, self.x - center.x)
+
+        def update_func(mob, alpha):
+            new_x = center.x + r * np.cos(start_angle + alpha * angle)
+            new_y = center.y + r * np.sin(start_angle + alpha * angle)
+            self.x_tracker.set_value(new_x)
+            self.y_tracker.set_value(new_y)
+
+        self.scene.play(UpdateFromAlphaFunc(self.circle, update_func), run_time=run_time)
 
     def __iter__(self):
         """
