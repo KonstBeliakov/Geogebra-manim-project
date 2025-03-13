@@ -2,10 +2,11 @@ import math
 from random import uniform
 from math import *
 
-from manim import TAU
+import numpy as np
+from manim import TAU, VGroup
 
 from circle import Circle
-from point import Point, get_point_by_name
+from point import Point, get_point_by_name, point_names
 from functools import update_wrapper
 
 from segment import Segment
@@ -222,3 +223,42 @@ def point_on_circle(circle, pointName=None):
     y = cy + circle.r * sin(angle)
 
     return Point(_scene, name=pointName, x=x, y=y)
+
+
+'''
+@on_scene
+def recenter_camera():
+    p_x = [point.x for point in point_names.values()]
+    p_y = [point.y for point in point_names.values()]
+
+    center = np.array([(max(p_x) + min(p_x)) / 2, (max(p_y) + min(p_y)) / 2, 0])
+    width = max(p_x) - min(p_x) + 2
+    height = max(p_y) - min(p_y) + 2
+
+    print(_scene)
+    print(_scene.camera)
+    print(_scene.camera.__dict__)
+
+    new_width = max(width, height * _scene.camera.frame.get_aspect_ratio())
+
+    _scene.play(
+        _scene.camera.frame.animate.move_to(center).set_width(new_width),
+        run_time=2
+    )
+'''
+
+
+def recenter_camera(scene):
+    p_x = [point.x for point in point_names.values()]
+    p_y = [point.y for point in point_names.values()]
+
+    center = np.array([(max(p_x) + min(p_x)) / 2, (max(p_y) + min(p_y)) / 2, 0])
+    width = max(p_x) - min(p_x) + 2
+    height = max(p_y) - min(p_y) + 2
+
+    new_width = max(width, height * scene.camera.frame.get_aspect_ratio())
+
+    scene.play(
+        scene.camera.frame.animate.move_to(center).set_width(new_width),
+        run_time=2
+    )
