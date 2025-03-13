@@ -78,47 +78,72 @@ def on_scene(func):
     return wrapper
 
 
-@on_scene
-def median(triangle: str, segment_name: str):
+def prepare_segment(scene, triangle: str, segment_name: str, point_builder):
+    """
+    Auxiliary function to prepare a segment within a triangle.
+
+    This function performs the following steps:
+      1) Checks whether to reverse the segment_name so that the first character
+         represents the vertex that belongs to the triangle.
+      2) Retrieves p1, the point corresponding to the vertex in segment_name,
+         and the remaining two vertices A and B (from the triangle that are not in segment_name).
+      3) Creates a second point p2 using the provided point_builder callable.
+      4) Constructs a segment between p1 and p2 and returns p2.
+
+    Parameters:
+        scene: The scene or canvas where the segment is being created.
+        triangle (str): A string representing the triangle's vertices.
+        segment_name (str): A two-character string where exactly one character must be a vertex
+                            of the triangle (representing the common vertex) and the other must not.
+        point_builder (callable): A function that takes (scene, p1, A, B, name) as parameters
+                                  and returns the second point (p2) for the segment.
+
+    Returns:
+        The point p2 created by the point_builder.
+
+    Raises:
+        ValueError: If both characters in segment_name belong to the triangle.
+                    "Segment name must contain exactly one vertex from the triangle (not both)."
+        ValueError: If neither of the characters in segment_name belong to the triangle.
+                    "Segment name must contain exactly one vertex from the triangle."
+    """
+    if segment_name[0] in triangle and segment_name[1] in triangle:
+        raise ValueError("Segment name must contain exactly one vertex from the triangle (not both).")
+    if segment_name[0] not in triangle and segment_name[1] not in triangle:
+        raise ValueError("Segment name must contain exactly one vertex from the triangle.")
     if segment_name[0] not in triangle:
         segment_name = segment_name[::-1]
 
     p1 = get_point_by_name(segment_name[0])
     A, B = [get_point_by_name(i) for i in triangle if i not in segment_name]
-    p2 = midPoint(_scene, A, B, name=segment_name[1])
 
-    Segment(_scene, p1, p2)
-    return p2
+    p2 = point_builder(scene, p1, A, B, segment_name[1])
+    Segment(scene, p1, p2)
+
+
+@on_scene
+def median(triangle: str, segment_name: str):
+    def midpoint_builder(scene, p1, A, B, name):
+        return midPoint(scene, A, B, name=name)
+
+    return prepare_segment(_scene, triangle, segment_name, midpoint_builder)
 
 
 @on_scene
 def bisector(triangle: str, segment_name: str):
-    if segment_name[0] not in triangle:
-        segment_name = segment_name[::-1]
+    def bisector_builder(scene, p1, A, B, name):
+        return Point(scene, name=name, get_position=lambda: get_bisector_position(p1, A, B))
 
-    p1 = get_point_by_name(segment_name[0])
-    A, B = [get_point_by_name(i) for i in triangle if i not in segment_name]
-
-    p2 = Point(_scene, name=segment_name[1], get_position=lambda: get_bisector_position(p1, A, B))
-
-    Segment(_scene, p1, p2)
-
-    return p2
+    return prepare_segment(_scene, triangle, segment_name, bisector_builder)
 
 
 @on_scene
 def height(triangle: str, segment_name: str):
-    if segment_name[0] not in triangle:
-        segment_name = segment_name[::-1]
+    def altitude_builder(scene, p1, A, B, name):
+        return Point(scene, name=name, get_position=lambda: get_altitude_position(p1, A, B))
 
-    p1 = get_point_by_name(segment_name[0])
-    A, B = [get_point_by_name(i) for i in triangle if i not in segment_name]
+    return prepare_segment(_scene, triangle, segment_name, altitude_builder)
 
-    p2 = Point(_scene, name=segment_name[1], get_position=lambda: get_altitude_position(p1, A, B))
-
-    Segment(_scene, p1, p2)
-
-    return p2
 
 
 @on_scene
