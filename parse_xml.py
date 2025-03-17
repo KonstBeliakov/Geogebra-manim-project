@@ -13,7 +13,6 @@ def parse(ggb_file):
             used = {}
 
             for element in root:
-                print(element)
                 if element.tag == "element":
                     label = element.get("label")
 
@@ -32,15 +31,17 @@ def parse(ggb_file):
                     command_name = element.get("name")
 
                     if command_name == 'Segment':
-                        refs = element.find("input")
-                        a, b = refs.get('a0'), refs.get('a1')
+                        inputs = element.find("input")
+                        a, b = inputs.get('a0'), inputs.get('a1')
                         label = element.find("output").get('a0')
+                        used[label] = True
                         operations.append(f"Segment({a}, {b}, {label})")
-
+  
                     if command_name == 'Midpoint':
-                        refs = element.find("input")
-                        a, b = refs.get('a0'), refs.get('a1')
+                        inputs = element.find("input")
+                        a, b = inputs.get('a0'), inputs.get('a1')
                         label = element.find("output").get('a0')
+                        used[label] = True
                         operations.append(f"Midpoint({a}, {b}, {label})")
 
                     if command_name == 'Polygon':
@@ -50,6 +51,7 @@ def parse(ggb_file):
                         labels = [outputs.get(f"a{i}") for i in range(len(outputs.attrib))]
                         for i in range(len(points)):
                             operations.append(f"Segment({points[i]}, {points[(i+1)%len(points)]}, {labels[i]})")
+                            used[labels[i]] = True
     return operations
 
 ans = parse("test1.ggb")
