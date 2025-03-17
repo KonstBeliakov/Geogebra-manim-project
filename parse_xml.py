@@ -1,62 +1,57 @@
 import xml.etree.ElementTree as ET
-
-from manim import *
-
-
-tree = ET.parse('test1.xml')
-root = tree.getroot()
+import zipfile
 
 
-def draw_point(scene, name, x, y, z):
-    dot = Dot(point=np.array([x, y, z]), color=BLUE)
-    scene.add(dot)
+def parse(ggb_file):
+    with zipfile.ZipFile(ggb_file, 'r') as z:
+        with z.open('geogebra.xml') as xml_file:
+            tree = ET.parse(xml_file)
+            root = tree.getroot().find("construction")
 
-    point_name_text = Text(name, font_size=30)
-    point_name_text.move_to((x, y + 0.3, 0))
-    scene.play(Write(point_name_text))
+            operations = []
 
+            used = {}
 
-operations = []
+            for element in root:
+                print(element)
+                if element.tag == "element":
+                    label = element.get("label")
 
+                    if label in used:
+                        continue
+                    used[label] = True
+                    element_type = element.get('type')
 
-def parse(element: ET.Element, scene):
-    for obj_child in element:
-        parse(obj_child, scene)
-    if 'type' in element.attrib:
-        if element.attrib['type'] == 'point':
-            for child in element:
-                if child.tag == 'coords':
-                    draw_point(name=element.get('label'),
-                               x=float(child.get('x')),
-                               y=float(child.get('y')),
-                               z=float(child.get('z'))
-                               )
-    # ....
-    #    color = get_color()
-    #    operations.append(f"{draw_bisector.__name__}('{trianle_name}', {if color is not None "color={color}" else "")")
-    #...
-    #    draw_median()
-    #...
-    #    operations.append(f"{draw_point_on_circle.__name__}('{circle_name}', '{point_name}')")
+                    if element_type == 'point':
+                        coords = element.find("coords")
+                        x, y, z = float(coords.get("x")), float(coords.get("y")), float(coords.get("z"))
+                        operations.append(f"Point({x}, {y}, {z}, label = {label})") #todo
 
-    #...
-    #    operations.append(f"{animate.__name__}('A')")
-def to_code():
-    with open('code.py', 'w', encoding='utf-8') as file:
-        file.write(f"""
-from manim import *
-from utils import *
+                elif element.tag == "command":
 
+                    command_name = element.get("name")
 
-class Main(Scene):
-    def construct(self):
-        init(scene=self)
-    {'\t\t\n'.join(operations)}""")
+                    if command_name == 'Segment':
+                        refs = element.find("input")
+                        a, b = refs.get('a0'), refs.get('a1')
+                        label = element.find("output").get('a0')
+                        operations.append(f"Segment({a}, {b}, {label})")
 
-#operations.append('move_something()')
+                    if command_name == 'Midpoint':
+                        refs = element.find("input")
+                        a, b = refs.get('a0'), refs.get('a1')
+                        label = element.find("output").get('a0')
+                        operations.append(f"Midpoint({a}, {b}, {label})")
 
+                    if command_name == 'Polygon':
+                        inputs = element.find("input")
+                        outputs = element.find("output")
+                        points = [inputs.get(f"a{i}") for i in range(len(inputs.attrib))]
+                        labels = [outputs.get(f"a{i}") for i in range(len(outputs.attrib))]
+                        for i in range(len(points)):
+                            operations.append(f"Segment({points[i]}, {points[(i+1)%len(points)]}, {labels[i]})")
+    return operations
 
-class TrilliumScene(Scene):
-    def construct(self):
-        parse(root, self)
-        self.wait(1)
+ans = parse("test1.ggb")
+
+print(ans, sep="\n")
