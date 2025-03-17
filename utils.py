@@ -66,6 +66,7 @@ def get_altitude_position(vertex, A, B):
 
 
 _scene = None
+_scaling_coefficient = 1
 
 
 def init(scene):
@@ -168,7 +169,9 @@ def segment(pointNames: str):
 
 @on_scene
 def point(name: str, x=None, y=None):
-    return Point(_scene, name, x, y)
+    return Point(_scene, name,
+                 None if x is None else x / _scaling_coefficient,
+                 None if y is None else y / _scaling_coefficient)
 
 
 @on_scene
@@ -176,9 +179,9 @@ def points(*points_data):
     points = []
     for point_data in points_data:
         if isinstance(point_data, str):
-            points.append(Point(_scene, name=point_data))
+            points.append(point(name=point_data))
         else:
-            points.append(Point(_scene, *point_data))
+            points.append(point(*point_data))
     return points
 
 
@@ -225,6 +228,15 @@ def point_on_circle(circle, pointName=None):
     return Point(_scene, name=pointName, x=x, y=y)
 
 
+@on_scene
+def move_points(points, positions, run_time=2):
+    _scene.play(
+        *[point.x_tracker.animate.set_value(new_x) for point, (new_x, _) in zip(points, positions)],
+        *[point.y_tracker.animate.set_value(new_y) for point, (_, new_y) in zip(points, positions)],
+        run_time=run_time
+    )
+
+
 '''
 @on_scene
 def recenter_camera():
@@ -248,17 +260,27 @@ def recenter_camera():
 '''
 
 
-def recenter_camera(scene):
-    p_x = [point.x for point in point_names.values()]
-    p_y = [point.y for point in point_names.values()]
+@on_scene
+def recenter_camera(run_time=2):
+    global _scaling_coefficient
+
+    points = point_names.values()
+    p_x = [point.x for point in points]
+    p_y = [point.y for point in points]
 
     center = np.array([(max(p_x) + min(p_x)) / 2, (max(p_y) + min(p_y)) / 2, 0])
     width = max(p_x) - min(p_x) + 2
     height = max(p_y) - min(p_y) + 2
 
-    new_width = max(width, height * scene.camera.frame.get_aspect_ratio())
+    new_width = max(width, height * _scene.camera.frame.get_aspect_ratio())
 
-    scene.play(
-        scene.camera.frame.animate.move_to(center).set_width(new_width),
-        run_time=2
-    )
+    scaling_factor = new_width / _scene.camera.frame_width
+    _scaling_coefficient *= scaling_factor
+
+    def new_position(x, y):
+        x_new = (x - center[0]) / scaling_factor
+        y_new = (y - center[1]) / scaling_factor
+
+        return x_new, y_new
+
+    move_points(points, [new_position(point.x, point.y) for point in points], run_time=run_time)

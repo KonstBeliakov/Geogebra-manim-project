@@ -1,8 +1,5 @@
-from random import randrange
-
 from manim import *
 from utils import *
-from utils import _scene
 
 
 class MultiplePointsAndScaling(MovingCameraScene):
@@ -10,8 +7,8 @@ class MultiplePointsAndScaling(MovingCameraScene):
         init(self)
 
         for i in range(1, 10):
-            point('ABCDEFGHIJ'[i], randrange(-10 * i, 10 * i), randrange(-10 * i, 10 * i))
-            recenter_camera(self)
+            point('ABCDEFGHIJ'[i], i * 10, i * 10)
+            recenter_camera()
 
         self.wait(1)
 
