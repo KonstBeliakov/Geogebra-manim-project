@@ -1,19 +1,29 @@
+from random import randrange
+
 from manim import *
 from utils import *
 
 from math import *
 
 
-def example1():
+def example0():
     triangle('ABC')
 
-    median('ABC', "BM")
-    bisector('ABC', 'BD')
-    height('ABC', 'AH')
+    median('ABC', 'BM')
 
-    move_randomly('A')
-    move_randomly('B')
-    move_randomly('C')
+
+def example1():
+    points(('A', 0, 0), 'B', 'C')
+
+    triangle(('A_1','B_1', 'C_1'))
+
+    median(('A_1', 'B_1', 'C_1'),  ('B_1', 'M'))
+    #bisector('ABC', 'BD')
+    #height('ABC', 'AH')
+
+    #move_randomly('A')
+    #move_randomly('B')
+    #move_randomly('C')
 
 
 def example2():
@@ -29,8 +39,21 @@ def example2():
     move_along_circle('B', c)
 
 
+def example3():
+    for i in range(1, 10):
+        point('ABCDEFGHIJ'[i], randrange(-10*i, 10*i), randrange(-10*i, 10*i))
+        recenter_camera()
+
+
+def example4():
+    circle((0,0), 2, 'a')
+    circle((3,0), 3, 'b')
+
+    intersect_by_labels('a', 'b', ('A', 'B'))
+
+
 class Main(Scene):
     def construct(self):
         init(scene=self)
 
-        example2()
+        example4()

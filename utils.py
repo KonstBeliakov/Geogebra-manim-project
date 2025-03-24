@@ -3,9 +3,9 @@ from random import uniform
 from math import *
 
 import numpy as np
-from manim import TAU, VGroup
+from manim import TAU
 
-from circle import Circle
+from circle import Circle, get_figure
 from point import Point, get_point_by_name, point_names
 from functools import update_wrapper
 
@@ -158,8 +158,8 @@ def triangle(pointNames: str):
 
 
 @on_scene
-def circle(center=None, r=1):
-    return Circle(_scene, center=center, r=r)
+def circle(center=None, r=1, label=None):
+    return Circle(_scene, center=center, r=r, label=label)
 
 
 @on_scene
@@ -186,7 +186,7 @@ def points(*points_data):
 
 
 @on_scene
-def intersect(segment1: str, segment2: str, point_name=None):
+def intersect_segments(segment1: str, segment2: str, point_name=None):
     p1_name = get_point_by_name(segment1[0])
     p2_name = get_point_by_name(segment1[1])
 
@@ -197,6 +197,67 @@ def intersect(segment1: str, segment2: str, point_name=None):
     s2 = Segment(_scene, p3_name, p4_name)
 
     return s1.intersect(s2, pointName=point_name)
+
+
+@on_scene
+def _circle_intersection(circle1, circle2, pointNames=None):
+    x0, y0 = circle1.center
+    x1, y1 = circle2.center
+    r0, r1 = circle1.r, circle2.r
+
+    dx = x1 - x0
+    dy = y1 - y0
+    d = math.hypot(dx, dy)
+
+    if d > r0 + r1:
+        # The circles do not intersect because they are too far apart
+        return None
+    if d < abs(r0 - r1):
+        # One circle is completely contained within the other
+        return None
+    if d == 0 and r0 == r1:
+        # The circles coincide: infinite number of intersection points
+        return None
+
+    # Distance from the center of the first circle to the line passing through the intersection points
+    a = (r0 ** 2 - r1 ** 2 + d ** 2) / (2 * d)
+    # Distance from this line to the intersection points
+    h = math.sqrt(max(r0 ** 2 - a ** 2, 0))
+
+    # Coordinates of the point on the line between the centers, from which we offset h perpendicularly
+    x2 = x0 + a * dx / d
+    y2 = y0 + a * dy / d
+
+    rx = -h * dy / d
+    ry = h * dx / d
+
+    intersection1 = (x2 + rx, y2 + ry)
+    intersection2 = (x2 - rx, y2 - ry)
+
+    if intersection1 == intersection2:
+        name1 = None if pointNames is None else pointNames[0]
+        return [Point(_scene, name=name1, x=intersection1[0], y=intersection1[1])]
+    else:
+        name1 = None if pointNames is None else pointNames[0]
+        name2 = None if pointNames is None else pointNames[1]
+        return [Point(_scene, name=name1, x=intersection1[0], y=intersection1[1]),
+                Point(_scene, name=name2, x=intersection2[0], y=intersection2[1])]
+
+
+@on_scene
+def intersect_by_labels(label1: str, label2: str, pointNames=None):
+    f1 = get_figure(label1)
+    f2 = get_figure(label2)
+
+    if isinstance(f1, Circle) and isinstance(f2, Circle):
+        return _circle_intersection(f1, f2)
+    if isinstance(f1, Segment) and isinstance(f2, Circle):
+        raise ValueError(f'Intersection of circle and segment not implemented yet.')
+    if isinstance(f2, Segment) and isinstance(f1, Circle):
+        raise ValueError(f'Intersection of circle and segment not implemented yet.')
+    if isinstance(f1, Segment) and isinstance(f2, Segment):
+        return f1.intersect(f2, None if pointNames is None else pointNames[0])
+    raise ValueError(f'Can\'t intersect {f1.label} and {f2.label}.')
 
 
 @on_scene
