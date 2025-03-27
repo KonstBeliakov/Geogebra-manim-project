@@ -52,8 +52,15 @@ def example4():
     intersect_by_labels('a', 'b', ('A', 'B'))
 
 
+def example5():
+    circle((0, 0), 2, 'a')
+    points(('A', -3, -3), ('B', 3, 3))
+    segment('AB', 'b')
+    intersect_by_labels('a', 'b', pointNames=('C', 'D'))
+
+
 class Main(Scene):
     def construct(self):
         init(scene=self)
 
-        example4()
+        example5()

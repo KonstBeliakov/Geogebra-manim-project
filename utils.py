@@ -151,7 +151,6 @@ def height(triangle: str, segment_name: str):
     return prepare_segment(_scene, triangle, segment_name, altitude_builder)
 
 
-
 @on_scene
 def triangle(pointNames: str):
     return tr.Triangle(scene=_scene, p1=pointNames[0], p2=pointNames[1], p3=pointNames[2])
@@ -163,8 +162,8 @@ def circle(center=None, r=1, label=None):
 
 
 @on_scene
-def segment(pointNames: str):
-    return Segment(_scene, pointNames[0], pointNames[1])
+def segment(pointNames: str, label=None):
+    return Segment(_scene, pointNames[0], pointNames[1], label=label)
 
 
 @on_scene
@@ -245,6 +244,54 @@ def _circle_intersection(circle1, circle2, pointNames=None):
 
 
 @on_scene
+def segment_circle_intersections(segment, circle, pointNames=None):
+    x1, y1 = segment.p1.x, segment.p1.y
+    x2, y2 = segment.p2.x, segment.p2.y
+
+    cx, cy = circle.center
+    r = circle.r
+
+    dx = x2 - x1
+    dy = y2 - y1
+
+    # Translate the coordinate system so that the center of the circle is at the origin
+    x1c = x1 - cx
+    y1c = y1 - cy
+
+    # Substitute the parametric equation of the line into the equation of the circle:
+    # (x1c + t*dx)^2 + (y1c + t*dy)^2 = r^2
+    # This results in a quadratic equation in t:
+    # (dx^2 + dy^2) * t^2 + 2*(x1c*dx + y1c*dy) * t + (x1c^2 + y1c^2 - r^2) = 0
+    A = dx ** 2 + dy ** 2
+    B = 2 * (x1c * dx + y1c * dy)
+    C = x1c ** 2 + y1c ** 2 - r ** 2
+
+    discriminant = B ** 2 - 4 * A * C
+
+    intersections = []
+
+    if discriminant < 0:
+        # No real roots - the segment and the circle do not intersect
+        return None
+    else:
+        # Find the roots of the quadratic equation
+        sqrt_disc = math.sqrt(discriminant)
+        t1 = (-B + sqrt_disc) / (2 * A)
+        t2 = (-B - sqrt_disc) / (2 * A)
+
+        # Check if the intersection points lie on the segment (t in the range [0,1])
+        for t in [t1, t2]:
+            if 0 <= t <= 1:
+                xi = x1 + t * dx
+                yi = y1 + t * dy
+                intersections.append((xi, yi))
+
+        if not intersections:
+            return None
+        return [Point(_scene, name, x, y) for name, (x, y) in zip(pointNames, intersections)]
+
+
+@on_scene
 def intersect_by_labels(label1: str, label2: str, pointNames=None):
     f1 = get_figure(label1)
     f2 = get_figure(label2)
@@ -252,9 +299,9 @@ def intersect_by_labels(label1: str, label2: str, pointNames=None):
     if isinstance(f1, Circle) and isinstance(f2, Circle):
         return _circle_intersection(f1, f2)
     if isinstance(f1, Segment) and isinstance(f2, Circle):
-        raise ValueError(f'Intersection of circle and segment not implemented yet.')
+        return segment_circle_intersections(f1, f2, pointNames=pointNames)
     if isinstance(f2, Segment) and isinstance(f1, Circle):
-        raise ValueError(f'Intersection of circle and segment not implemented yet.')
+        return segment_circle_intersections(f2, f1, pointNames=pointNames)
     if isinstance(f1, Segment) and isinstance(f2, Segment):
         return f1.intersect(f2, None if pointNames is None else pointNames[0])
     raise ValueError(f'Can\'t intersect {f1.label} and {f2.label}.')

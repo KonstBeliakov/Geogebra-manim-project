@@ -1,16 +1,10 @@
-import math
 from random import choice
 
-import manim
 from manim import *
 
-import point
+from figures import *
 from point import get_point_or_random
-from segment import Segment
 from settings import *
-
-valid_figure_labels = [chr(i) for i in range(ord('a'), ord('z') + 1)]
-figure_names = {}
 
 
 def get_figure(label):
