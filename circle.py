@@ -1,5 +1,3 @@
-from random import choice
-
 from manim import *
 
 from figures import *
@@ -7,18 +5,13 @@ from point import get_point_or_random
 from settings import *
 
 
-def get_figure(label):
-    if label not in figure_names:
-        raise ValueError(f'There is no such figure with label "{label}".')
-    return figure_names[label]
-
-
-class Circle:
+class Circle(Figure):
     def __init__(self, scene, center=None, r=1, label=None):
         """
         :param scene: scene where to draw a circle
         :param center: Point instance or name of the point. (If there is no such point it will be created)
         :param r: radius of the circle
+        :param label: label of the circle
         """
         self.scene = scene
 
@@ -28,17 +21,7 @@ class Circle:
         self.center = center
         self.r = r
 
-        if label is None:
-            label = choice(valid_figure_labels)
-        if label in figure_names:
-            raise ValueError(f"The name {label} is already in use")
-        self.label = label
-        figure_names[label] = self
-
-        if label in valid_figure_labels:
-            valid_figure_labels.remove(label)
-
-        self.render()
+        super().__init__(label=label)
 
     def render(self):
         circle = manim.Circle(radius=self.r, color=LINES_COLOR, fill_opacity=FIGURE_FILL_OPACITY)

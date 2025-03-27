@@ -6,6 +6,7 @@ import numpy as np
 from manim import TAU
 
 from circle import Circle, get_figure
+from figures import Figure
 from point import Point, get_point_by_name, point_names
 from functools import update_wrapper
 
@@ -185,7 +186,7 @@ def points(*points_data):
 
 
 @on_scene
-def intersect_segments(segment1: str, segment2: str, point_name=None):
+def _intersect_segments(segment1: str, segment2: str, point_name=None):
     p1_name = get_point_by_name(segment1[0])
     p2_name = get_point_by_name(segment1[1])
 
@@ -244,7 +245,7 @@ def _circle_intersection(circle1, circle2, pointNames=None):
 
 
 @on_scene
-def segment_circle_intersections(segment, circle, pointNames=None):
+def _segment_circle_intersections(segment, circle, pointNames=None):
     x1, y1 = segment.p1.x, segment.p1.y
     x2, y2 = segment.p2.x, segment.p2.y
 
@@ -292,16 +293,18 @@ def segment_circle_intersections(segment, circle, pointNames=None):
 
 
 @on_scene
-def intersect_by_labels(label1: str, label2: str, pointNames=None):
-    f1 = get_figure(label1)
-    f2 = get_figure(label2)
+def intersect_figures(f1: str|Figure, f2: str|Figure, pointNames=None):
+    if isinstance(f1, str):
+        f1 = get_figure(f1)
+    if isinstance(f2, str):
+        f2 = get_figure(f2)
 
     if isinstance(f1, Circle) and isinstance(f2, Circle):
         return _circle_intersection(f1, f2)
     if isinstance(f1, Segment) and isinstance(f2, Circle):
-        return segment_circle_intersections(f1, f2, pointNames=pointNames)
+        return _segment_circle_intersections(f1, f2, pointNames=pointNames)
     if isinstance(f2, Segment) and isinstance(f1, Circle):
-        return segment_circle_intersections(f2, f1, pointNames=pointNames)
+        return _segment_circle_intersections(f2, f1, pointNames=pointNames)
     if isinstance(f1, Segment) and isinstance(f2, Segment):
         return f1.intersect(f2, None if pointNames is None else pointNames[0])
     raise ValueError(f'Can\'t intersect {f1.label} and {f2.label}.')

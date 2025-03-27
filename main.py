@@ -49,7 +49,7 @@ def example4():
     circle((0,0), 2, 'a')
     circle((3,0), 3, 'b')
 
-    intersect_by_labels('a', 'b', ('A', 'B'))
+    intersect_figures('a', 'b', ('A', 'B'))
 
 
 def example5():

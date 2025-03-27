@@ -3,12 +3,13 @@ from point import *
 from settings import *
 
 
-class Segment:
+class Segment(Figure):
     def __init__(self, scene, p1=None, p2=None, label=None):
         """
         :param scene: scene where to draw the segment
         :param p1: Point instance or name of the point. (If there is no such point it will be created)
         :param p2: Point instance or name of the point. (If there is no such point it will be created)
+        :param label: label of the segment
         """
         self.scene = scene
 
@@ -20,17 +21,7 @@ class Segment:
         self.p1 = p1
         self.p2 = p2
 
-        if label is None:
-            label = choice(valid_figure_labels)
-        if label in figure_names:
-            raise ValueError(f"The name {label} is already in use")
-        self.label = label
-        figure_names[label] = self
-
-        if label in valid_figure_labels:
-            valid_figure_labels.remove(label)
-
-        self.render()
+        super().__init__(label=label)
 
     def render(self):
         self.line = always_redraw(lambda: Line(tuple(self.p1), tuple(self.p2), color=LINES_COLOR))
