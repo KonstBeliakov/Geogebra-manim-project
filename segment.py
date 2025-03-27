@@ -4,7 +4,7 @@ from settings import *
 
 
 class Segment(Figure):
-    def __init__(self, scene, p1=None, p2=None, label=None):
+    def __init__(self, scene, p1: str | Point = None, p2: str | Point = None, label: str = None):
         """
         :param scene: scene where to draw the segment
         :param p1: Point instance or name of the point. (If there is no such point it will be created)

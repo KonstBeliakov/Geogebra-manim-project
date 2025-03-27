@@ -56,7 +56,16 @@ def example5():
     circle((0, 0), 2, 'a')
     points(('A', -3, -3), ('B', 3, 3))
     segment('AB', 'b')
-    intersect_by_labels('a', 'b', pointNames=('C', 'D'))
+    intersect_figures('a', 'b', pointNames=('C', 'D'))
+
+    move('A', -3, -1)
+
+
+def example6():
+    triangle('ABC', 'a')
+    circumscribed_circle('a', center_name='O')
+
+    move('A', 0, 0)
 
 
 class Main(Scene):

@@ -12,6 +12,7 @@ from functools import update_wrapper
 
 from segment import Segment
 import triangle as tr
+from triangle import Triangle
 
 
 def midPoint(scene, p1: Point, p2: Point, name=None):
@@ -153,8 +154,8 @@ def height(triangle: str, segment_name: str):
 
 
 @on_scene
-def triangle(pointNames: str):
-    return tr.Triangle(scene=_scene, p1=pointNames[0], p2=pointNames[1], p3=pointNames[2])
+def triangle(pointNames: str, label=None):
+    return tr.Triangle(scene=_scene, p1=pointNames[0], p2=pointNames[1], p3=pointNames[2], label=label)
 
 
 @on_scene
@@ -249,7 +250,7 @@ def _segment_circle_intersections(segment, circle, pointNames=None):
     x1, y1 = segment.p1.x, segment.p1.y
     x2, y2 = segment.p2.x, segment.p2.y
 
-    cx, cy = circle.center
+    cx, cy = circle.center.x, circle.center.y
     r = circle.r
 
     dx = x2 - x1
@@ -293,7 +294,7 @@ def _segment_circle_intersections(segment, circle, pointNames=None):
 
 
 @on_scene
-def intersect_figures(f1: str|Figure, f2: str|Figure, pointNames=None):
+def intersect_figures(f1: str | Figure, f2: str | Figure, pointNames=None):
     if isinstance(f1, str):
         f1 = get_figure(f1)
     if isinstance(f2, str):
@@ -308,6 +309,14 @@ def intersect_figures(f1: str|Figure, f2: str|Figure, pointNames=None):
     if isinstance(f1, Segment) and isinstance(f2, Segment):
         return f1.intersect(f2, None if pointNames is None else pointNames[0])
     raise ValueError(f'Can\'t intersect {f1.label} and {f2.label}.')
+
+
+@on_scene
+def circumscribed_circle(triangle: str | Triangle, circle_label=None, center_name=None):
+    if isinstance(triangle, str):
+        triangle = get_figure(triangle)
+
+    return triangle.circumscribed_circle(circle_label=circle_label, point_name=center_name)
 
 
 @on_scene

@@ -1,15 +1,12 @@
-import math
-
-from manim import *
-from utils import *
-from segment import Segment
 import circle
 from point import *
 from settings import *
+from utils import *
 
 
-class Triangle:
-    def __init__(self, scene, p1=None, p2=None, p3=None):
+class Triangle(Figure):
+    def __init__(self, scene, p1: str | Point = None, p2: str | Point = None, p3: str | Point = None,
+                 label: str = None):
         """
         :param scene: scene where to draw a triangle
         :param p1: Point instance or name of the point. (If there is no such point it will be created)
@@ -27,11 +24,12 @@ class Triangle:
 
         self.p1, self.p2, self.p3 = p1, p2, p3
 
-        self.render()
+        super().__init__(label=label)
 
-    def circumscribed_circle(self, point_name=None):
+    def circumscribed_circle(self, circle_label=None, point_name=None):
         """
         Drawing the circumscribes circle of the triangle
+        :param circle_label: optional label of the circle that will be returned
         :param point_name: optional name of the center of the circle
         :return: Circle -- circumscribed circle of the triangle
         """
@@ -59,9 +57,9 @@ class Triangle:
 
             return (Ux, Uy), r
 
-        center = Point(self.scene, name=point_name, get_position=lambda: get_circumscribed_center_position(self))
+        center = Point(self.scene, name=point_name, get_position=lambda: get_circumscribed_center_position(self)[0])
 
-        circ_circle = circle.Circle(self.scene, center, get_circumscribed_center_position(self)[1])
+        circ_circle = circle.Circle(self.scene, center, get_circumscribed_center_position(self)[1], label=circle_label)
 
         return circ_circle
 
