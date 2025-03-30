@@ -15,15 +15,15 @@ def example0():
 def example1():
     points(('A', 0, 0), 'B', 'C')
 
-    triangle(('A_1','B_1', 'C_1'))
+    triangle(('A','B', 'C'))
 
-    median(('A_1', 'B_1', 'C_1'),  ('B_1', 'M'))
-    #bisector('ABC', 'BD')
-    #height('ABC', 'AH')
+    median(('A', 'B', 'C'),  ('B', 'M'))
+    bisector('ABC', 'BD')
+    height('ABC', 'AH')
 
-    #move_randomly('A')
-    #move_randomly('B')
-    #move_randomly('C')
+    move_randomly('A')
+    move_randomly('B')
+    move_randomly('C')
 
 
 def example2():

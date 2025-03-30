@@ -12,7 +12,7 @@ def get_figure(label):
 
 
 class Figure(ABC):
-    def __init__(self, label=None):
+    def __init__(self, scene, label=None):
         if label is None:
             label = choice(valid_figure_labels)
         if label in figure_names:
@@ -22,6 +22,8 @@ class Figure(ABC):
 
         if label in valid_figure_labels:
             valid_figure_labels.remove(label)
+
+        self.scene = scene
 
         self.render()
 

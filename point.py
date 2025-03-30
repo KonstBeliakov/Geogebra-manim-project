@@ -24,6 +24,28 @@ def get_point_or_random(scene, name: str | None) -> Point:
     return Point(scene, name)
 
 
+def to_point(scene, point: str | Point | tuple[int | float, int | float] | list[int | float, int | float] | None):
+    if point is None:
+        return Point(scene)
+    if isinstance(point, str):
+        return get_point_or_random(scene, point)
+    if isinstance(point, Point):
+        return point
+    if isinstance(point, tuple) or isinstance(point, list):
+        if len(point) != 2:
+            raise ValueError(f"Can't create a point from {type(point)} of length {len(point)}.")
+        if not isinstance(point[0], int) or isinstance(point[0], float):
+            raise ValueError(f"Can't create a point from {point}, because of wrong type of the x coordinate.")
+        if not isinstance(point[1], int) or isinstance(point[1], float):
+            raise ValueError(f"Can't create a point from {point}, because of wrong type of the y coordinate.")
+
+        for point in point_names.values():
+            if abs(point.x - point[0]) < 10 ** -6 and abs(point.y - point[1]) < 10 ** -6:
+                return point
+
+        return Point(scene, x=point[0], y=point[1])
+
+
 class Point:
     def __init__(self, scene, name=None, x=None, y=None, get_position=None):
         """

@@ -5,26 +5,23 @@ from utils import *
 
 
 class Triangle(Figure):
-    def __init__(self, scene, p1: str | Point = None, p2: str | Point = None, p3: str | Point = None,
+    def __init__(self, scene,
+                 p1: str | Point | tuple[float, float] = None,
+                 p2: str | Point | tuple[float, float] = None,
+                 p3: str | Point | tuple[float, float] = None,
                  label: str = None):
         """
         :param scene: scene where to draw a triangle
-        :param p1: Point instance or name of the point. (If there is no such point it will be created)
-        :param p2: Point instance or name of the point. (If there is no such point it will be created)
-        :param p3: Point instance or name of the point. (If there is no such point it will be created)
+        :param p1: Point instance or name of the point or it's coordinates. (If there is no such point it will be created)
+        :param p2: Point instance or name of the point or it's coordinates. (If there is no such point it will be created)
+        :param p3: Point instance or name of the point or it's coordinates. (If there is no such point it will be created)
         """
-        self.scene = scene
 
-        if isinstance(p1, str) or p1 is None:
-            p1 = get_point_or_random(scene, p1)
-        if isinstance(p2, str) or p2 is None:
-            p2 = get_point_or_random(scene, p2)
-        if isinstance(p3, str) or p3 is None:
-            p3 = get_point_or_random(scene, p3)
+        self.p1 = to_point(scene, p1)
+        self.p2 = to_point(scene, p2)
+        self.p3 = to_point(scene, p3)
 
-        self.p1, self.p2, self.p3 = p1, p2, p3
-
-        super().__init__(label=label)
+        super().__init__(scene, label=label)
 
     def circumscribed_circle(self, circle_label=None, point_name=None):
         """
