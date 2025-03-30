@@ -34,14 +34,14 @@ def to_point(scene, point: str | Point | tuple[int | float, int | float] | list[
     if isinstance(point, tuple) or isinstance(point, list):
         if len(point) != 2:
             raise ValueError(f"Can't create a point from {type(point)} of length {len(point)}.")
-        if not isinstance(point[0], int) or isinstance(point[0], float):
+        if not (isinstance(point[0], int) or isinstance(point[0], float)):
             raise ValueError(f"Can't create a point from {point}, because of wrong type of the x coordinate.")
-        if not isinstance(point[1], int) or isinstance(point[1], float):
+        if not (isinstance(point[1], int) or isinstance(point[1], float)):
             raise ValueError(f"Can't create a point from {point}, because of wrong type of the y coordinate.")
 
-        for point in point_names.values():
-            if abs(point.x - point[0]) < 10 ** -6 and abs(point.y - point[1]) < 10 ** -6:
-                return point
+        for p in point_names.values():
+            if abs(p.x - point[0]) < 10 ** -6 and abs(p.y - point[1]) < 10 ** -6:
+                return p
 
         return Point(scene, x=point[0], y=point[1])
 
@@ -59,7 +59,7 @@ class Point:
 
         self._get_position = get_position
         if self._get_position is not None:
-            x, y = self._get_position()
+            x, y = self.x, self.y
         else:
             if x is None:
                 x = uniform(-3, 3)
@@ -84,12 +84,16 @@ class Point:
     @property
     def x(self):
         if self._get_position is not None:
+            if self._get_position() is None:
+                return 10 ** 18  # infinitelly far point
             return self._get_position()[0]
         return self.x_tracker.get_value()
 
     @property
     def y(self):
         if self._get_position is not None:
+            if self._get_position() is None:
+                return 10 ** 18  # infinitelly far point...
             return self._get_position()[1]
         return self.y_tracker.get_value()
 

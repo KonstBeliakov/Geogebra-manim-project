@@ -68,8 +68,23 @@ def example6():
     move('A', 0, 0)
 
 
+def example7(scene):
+    point('A', 0, 1)
+
+    circle((0, 0), 0.75, 'a')
+    circle('A', 0.75, 'b')
+
+    intersect_figures('a', 'b')
+
+    move('A', 0, -1.5)
+
+    scene.wait(2)
+
+    move('A', 0, -2)
+
+
 class Main(Scene):
     def construct(self):
         init(scene=self)
 
-        example5()
+        example7(self)

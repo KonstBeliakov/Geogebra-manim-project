@@ -202,47 +202,49 @@ def _intersect_segments(segment1: str, segment2: str, point_name=None):
 
 @on_scene
 def _circle_intersection(circle1, circle2, pointNames=None):
-    x0, y0 = circle1.center
-    x1, y1 = circle2.center
-    r0, r1 = circle1.r, circle2.r
+    def get_positions(circle1, circle2):
+        x0, y0 = circle1.center.x, circle1.center.y
+        x1, y1 = circle2.center.x, circle2.center.y
+        r0, r1 = circle1.r, circle2.r
 
-    dx = x1 - x0
-    dy = y1 - y0
-    d = math.hypot(dx, dy)
+        dx = x1 - x0
+        dy = y1 - y0
+        d = math.hypot(dx, dy)
 
-    if d > r0 + r1:
-        # The circles do not intersect because they are too far apart
-        return None
-    if d < abs(r0 - r1):
-        # One circle is completely contained within the other
-        return None
-    if d == 0 and r0 == r1:
-        # The circles coincide: infinite number of intersection points
-        return None
+        if d > r0 + r1:
+            # The circles do not intersect because they are too far apart
+            return None, None
+        if d < abs(r0 - r1):
+            # One circle is completely contained within the other
+            return None, None
+        if d == 0 and r0 == r1:
+            # The circles coincide: infinite number of intersection points
+            return None, None
 
-    # Distance from the center of the first circle to the line passing through the intersection points
-    a = (r0 ** 2 - r1 ** 2 + d ** 2) / (2 * d)
-    # Distance from this line to the intersection points
-    h = math.sqrt(max(r0 ** 2 - a ** 2, 0))
+        # Distance from the center of the first circle to the line passing through the intersection points
+        a = (r0 ** 2 - r1 ** 2 + d ** 2) / (2 * d)
+        # Distance from this line to the intersection points
+        h = math.sqrt(max(r0 ** 2 - a ** 2, 0))
 
-    # Coordinates of the point on the line between the centers, from which we offset h perpendicularly
-    x2 = x0 + a * dx / d
-    y2 = y0 + a * dy / d
+        # Coordinates of the point on the line between the centers, from which we offset h perpendicularly
+        x2 = x0 + a * dx / d
+        y2 = y0 + a * dy / d
 
-    rx = -h * dy / d
-    ry = h * dx / d
+        rx = -h * dy / d
+        ry = h * dx / d
 
-    intersection1 = (x2 + rx, y2 + ry)
-    intersection2 = (x2 - rx, y2 - ry)
+        intersection1 = (x2 + rx, y2 + ry)
+        intersection2 = (x2 - rx, y2 - ry)
 
-    if intersection1 == intersection2:
-        name1 = None if pointNames is None else pointNames[0]
-        return [Point(_scene, name=name1, x=intersection1[0], y=intersection1[1])]
-    else:
-        name1 = None if pointNames is None else pointNames[0]
-        name2 = None if pointNames is None else pointNames[1]
-        return [Point(_scene, name=name1, x=intersection1[0], y=intersection1[1]),
-                Point(_scene, name=name2, x=intersection2[0], y=intersection2[1])]
+        if dist(intersection1, intersection2) < 10**-6:
+            return intersection1, None
+
+        return intersection1, intersection2
+
+    name1 = None if pointNames is None else pointNames[0]
+    name2 = None if pointNames is None else pointNames[1]
+    return [Point(_scene, name=name1, get_position=lambda: get_positions(circle1, circle2)[0]),
+            Point(_scene, name=name2, get_position=lambda: get_positions(circle1, circle2)[1])]
 
 
 @on_scene
