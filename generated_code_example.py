@@ -9,7 +9,7 @@ class MyScene(Scene):
         Point(self, 'B', 7.52, 2.56)
         Point(self, 'C', 7.22, 0.18)
         Segment(self, 'A', 'C', 'f')
-        Midpoint('self, A', 'C', 'D')
+        midPoint(self, 'A', 'C', 'D')
         Point(self, 'E', 4.98, -1.38)
         Point(self, 'F', 5.76, 3.18)
         Segment(self, 'E', 'F', 'g')

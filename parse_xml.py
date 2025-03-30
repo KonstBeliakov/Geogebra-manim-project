@@ -38,7 +38,7 @@ def parse(ggb_file):
                         a, b = inputs.get('a0'), inputs.get('a1')
                         label = element.find("output").get('a0')
                         used[label] = True
-                        operations.append(f"Midpoint('self, {a}', '{b}', '{label}')")
+                        operations.append(f"midPoint(self, '{a}', '{b}', '{label}')")
 
                     if command_name == 'Polygon':
                         inputs = element.find("input")
