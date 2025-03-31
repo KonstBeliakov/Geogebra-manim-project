@@ -61,11 +61,13 @@ def example5():
     move('A', -3, -1)
 
 
-def example6():
+def example6(scene):
     triangle('ABC', 'a')
     circumscribed_circle('a', center_name='O')
 
     move('A', 0, 0)
+
+    scene.wait(2)
 
 
 def example7(scene):
@@ -103,4 +105,4 @@ class Main(Scene):
     def construct(self):
         init(scene=self)
 
-        example8(self)
+        example6(self)

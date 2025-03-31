@@ -31,7 +31,7 @@ class Triangle(Figure):
         :return: Circle -- circumscribed circle of the triangle
         """
 
-        def get_circumscribed_center_position(triangle):
+        def get_circumscribed_pos_r(triangle):
             x1, y1 = triangle.p1.x, triangle.p1.y
             x2, y2 = triangle.p2.x, triangle.p2.y
             x3, y3 = triangle.p3.x, triangle.p3.y
@@ -54,9 +54,11 @@ class Triangle(Figure):
 
             return (Ux, Uy), r
 
-        center = Point(self.scene, name=point_name, get_position=lambda: get_circumscribed_center_position(self)[0])
+        center = Point(self.scene, name=point_name, get_position=lambda: get_circumscribed_pos_r(self)[0])
 
-        circ_circle = circle.Circle(self.scene, center, get_circumscribed_center_position(self)[1], label=circle_label)
+        circ_circle = circle.Circle(self.scene, center,
+                                    get_r=lambda: get_circumscribed_pos_r(self)[1],
+                                    label=circle_label)
 
         return circ_circle
 
