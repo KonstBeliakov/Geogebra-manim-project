@@ -83,8 +83,24 @@ def example7(scene):
     move('A', 0, -2)
 
 
+def example8(scene):
+    point('A', -1, -1)
+
+    circle((0, 0), 1, 'c')
+
+    s = Segment(scene, (-1, -1), (1, 1), 's')
+
+    intersect_figures('c', 's')
+
+    move('A', 0, -1)
+
+    scene.wait(2)
+
+    move('A', -0.3, -0.3)
+
+
 class Main(Scene):
     def construct(self):
         init(scene=self)
 
-        example7(self)
+        example8(self)

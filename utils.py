@@ -201,7 +201,7 @@ def _intersect_segments(segment1: str, segment2: str, point_name=None):
 
 
 @on_scene
-def _circle_intersection(circle1, circle2, pointNames=None):
+def _circle_intersection(circle1, circle2, pointNames: tuple[str, str] = (None, None)):
     def get_positions(circle1, circle2):
         x0, y0 = circle1.center.x, circle1.center.y
         x1, y1 = circle2.center.x, circle2.center.y
@@ -236,7 +236,7 @@ def _circle_intersection(circle1, circle2, pointNames=None):
         intersection1 = (x2 + rx, y2 + ry)
         intersection2 = (x2 - rx, y2 - ry)
 
-        if dist(intersection1, intersection2) < 10**-6:
+        if dist(intersection1, intersection2) < 10 ** -6:
             return intersection1, None
 
         return intersection1, intersection2
@@ -248,55 +248,58 @@ def _circle_intersection(circle1, circle2, pointNames=None):
 
 
 @on_scene
-def _segment_circle_intersections(segment, circle, pointNames=None):
-    x1, y1 = segment.p1.x, segment.p1.y
-    x2, y2 = segment.p2.x, segment.p2.y
+def _segment_circle_intersections(segment: Segment, circle: Circle, pointNames: tuple[str, str] = (None, None)):
+    def get_positions(segment, circle):
+        x1, y1 = segment.p1.x, segment.p1.y
+        x2, y2 = segment.p2.x, segment.p2.y
 
-    cx, cy = circle.center.x, circle.center.y
-    r = circle.r
+        cx, cy = circle.center.x, circle.center.y
+        r = circle.r
 
-    dx = x2 - x1
-    dy = y2 - y1
+        dx = x2 - x1
+        dy = y2 - y1
 
-    # Translate the coordinate system so that the center of the circle is at the origin
-    x1c = x1 - cx
-    y1c = y1 - cy
+        # Translate the coordinate system so that the center of the circle is at the origin
+        x1c = x1 - cx
+        y1c = y1 - cy
 
-    # Substitute the parametric equation of the line into the equation of the circle:
-    # (x1c + t*dx)^2 + (y1c + t*dy)^2 = r^2
-    # This results in a quadratic equation in t:
-    # (dx^2 + dy^2) * t^2 + 2*(x1c*dx + y1c*dy) * t + (x1c^2 + y1c^2 - r^2) = 0
-    A = dx ** 2 + dy ** 2
-    B = 2 * (x1c * dx + y1c * dy)
-    C = x1c ** 2 + y1c ** 2 - r ** 2
+        # Substitute the parametric equation of the line into the equation of the circle:
+        # (x1c + t*dx)^2 + (y1c + t*dy)^2 = r^2
+        # This results in a quadratic equation in t:
+        # (dx^2 + dy^2) * t^2 + 2*(x1c*dx + y1c*dy) * t + (x1c^2 + y1c^2 - r^2) = 0
+        A = dx ** 2 + dy ** 2
+        B = 2 * (x1c * dx + y1c * dy)
+        C = x1c ** 2 + y1c ** 2 - r ** 2
 
-    discriminant = B ** 2 - 4 * A * C
+        discriminant = B ** 2 - 4 * A * C
 
-    intersections = []
+        intersections = []
 
-    if discriminant < 0:
-        # No real roots - the segment and the circle do not intersect
-        return None
-    else:
-        # Find the roots of the quadratic equation
-        sqrt_disc = math.sqrt(discriminant)
-        t1 = (-B + sqrt_disc) / (2 * A)
-        t2 = (-B - sqrt_disc) / (2 * A)
+        if discriminant < 0:
+            # No real roots - the segment and the circle do not intersect
+            return [None, None]
+        else:
+            # Find the roots of the quadratic equation
+            sqrt_disc = math.sqrt(discriminant)
+            t1 = (-B + sqrt_disc) / (2 * A)
+            t2 = (-B - sqrt_disc) / (2 * A)
 
-        # Check if the intersection points lie on the segment (t in the range [0,1])
-        for t in [t1, t2]:
-            if 0 <= t <= 1:
-                xi = x1 + t * dx
-                yi = y1 + t * dy
-                intersections.append((xi, yi))
+            # Check if the intersection points lie on the segment (t in the range [0,1])
+            for t in [t1, t2]:
+                if 0 <= t <= 1:
+                    xi = x1 + t * dx
+                    yi = y1 + t * dy
+                    intersections.append((xi, yi))
+        if len(intersections) == 1:
+            intersections.append(None)
+        return intersections
 
-        if not intersections:
-            return None
-        return [Point(_scene, name, x, y) for name, (x, y) in zip(pointNames, intersections)]
+    return [Point(_scene, pointNames[0], get_position=lambda: get_positions(segment, circle)[0]),
+            Point(_scene, pointNames[1], get_position=lambda: get_positions(segment, circle)[1])]
 
 
 @on_scene
-def intersect_figures(f1: str | Figure, f2: str | Figure, pointNames=None):
+def intersect_figures(f1: str | Figure, f2: str | Figure, pointNames: tuple[str, str] = (None, None)):
     if isinstance(f1, str):
         f1 = get_figure(f1)
     if isinstance(f2, str):
