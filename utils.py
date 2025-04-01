@@ -5,7 +5,7 @@ from math import *
 import numpy as np
 from manim import TAU
 
-from circle import Circle, get_figure
+from circle import Circle, to_figure
 from figures import Figure
 from point import Point, get_point_by_name, point_names, to_point
 from functools import update_wrapper
@@ -300,10 +300,8 @@ def _segment_circle_intersections(segment: Segment, circle: Circle, pointNames: 
 
 @on_scene
 def intersect_figures(f1: str | Figure, f2: str | Figure, pointNames: tuple[str, str] = (None, None)):
-    if isinstance(f1, str):
-        f1 = get_figure(f1)
-    if isinstance(f2, str):
-        f2 = get_figure(f2)
+    f1 = to_figure(f1)
+    f2 = to_figure(f2)
 
     if isinstance(f1, Circle) and isinstance(f2, Circle):
         return _circle_intersection(f1, f2)
@@ -318,25 +316,31 @@ def intersect_figures(f1: str | Figure, f2: str | Figure, pointNames: tuple[str,
 
 @on_scene
 def circumscribed_circle(triangle: str | Triangle, circle_label=None, center_name=None):
-    if isinstance(triangle, str):
-        triangle = get_figure(triangle)
+    triangle = to_figure(triangle)
 
     return triangle.circumscribed_circle(circle_label=circle_label, point_name=center_name)
 
 
 @on_scene
-def move(pointName, x, y, run_time=2):
-    get_point_by_name(pointName).move(x, y, run_time)
+def move(point: str | Point | tuple[int | float, int | float],
+         x: float,
+         y: float,
+         run_time=2):
+    to_point(_scene, point).move(x, y, run_time=run_time)
 
 
 @on_scene
-def move_randomly(pointName, run_time=2):
-    move(pointName, uniform(-3, 3), uniform(-3, 3), run_time)
+def move_randomly(point: str | Point | tuple[int | float, int | float],
+                  run_time=2):
+    move(point, uniform(-3, 3), uniform(-3, 3), run_time=run_time)
 
 
 @on_scene
-def move_along_circle(pointName, circle, run_time=4):
-    p = get_point_by_name(pointName)
+def move_along_circle(point: str | Point | tuple[int | float, int | float],
+                      circle: str | Circle,
+                      run_time=4):
+    p = to_point(_scene, point)
+    circle = to_figure(circle)
     p.move_along_circle(circle,
                         run_time=run_time,
                         angle=TAU)
@@ -347,8 +351,7 @@ def tangent(circle: Circle | str,
                    point: str | Point | tuple[int | float, int | float],
                    pointNames: tuple[str, str] = (None, None),
                    segment_labels: tuple[str, str] = (None, None)):
-    if isinstance(circle, str):
-        circle = get_figure(circle)
+    circle = to_figure(circle)
     point = to_point(_scene, point)
 
     def find_tangent_circle_intersections(circle, point):
@@ -403,6 +406,55 @@ def tangent(circle: Circle | str,
     Segment(_scene, point, p2, label=segment_labels[1])
 
     return [p1, p2]
+
+
+@on_scene
+def arc_midpoint(p1: str | Point | tuple[int | float, int | float],
+                 p2: str | Point | tuple[int | float, int | float],
+                 circle: Circle | str,
+                 pointName: str = None):
+    p1 = to_point(_scene, p1)
+    p2 = to_point(_scene, p2)
+    circle = to_figure(circle)
+
+    def arc_midpoint(p1, p2, circle):
+        cx, cy = circle.center.x, circle.center.y
+        x1, y1 = p1.x, p1.y
+        x2, y2 = p2.x, p2.y
+
+        d1 = hypot(x1 - cx, y1 - cy)
+        d2 = hypot(x2 - cx, y2 - cy)
+
+        if abs(d1 - circle.r) > 10**-6:
+            raise ValueError(f'Points {p1} is not on the circle {circle}')
+
+        if abs(d2 - circle.r) > 10**-6:
+            raise ValueError(f'Point {p2} is not on the circle {circle}')
+
+        # Calculate angles for p1 and p2 relative to the circle's center
+        angle1 = math.atan2(y1 - cy, x1 - cx)
+        angle2 = math.atan2(y2 - cy, x2 - cx)
+
+        # Compute the difference between angles and normalize it to the range (-pi, pi]
+        d_angle = angle2 - angle1
+        while d_angle <= -math.pi:
+            d_angle += 2 * math.pi
+        while d_angle > math.pi:
+            d_angle -= 2 * math.pi
+
+        # Find the mid-angle for the minor arc
+        mid_angle = angle1 + d_angle / 2
+
+        # The radius is the distance from the center to either point (they lie on the circle)
+        r = math.sqrt((x1 - cx) ** 2 + (y1 - cy) ** 2)
+
+        # Compute the coordinates of the arc midpoint using the mid-angle
+        mx = cx + r * math.cos(mid_angle)
+        my = cy + r * math.sin(mid_angle)
+
+        return mx, my
+
+    return Point(_scene, name=pointName, get_position=lambda: arc_midpoint(p1, p2, circle))
 
 
 @on_scene

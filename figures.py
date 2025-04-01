@@ -5,12 +5,6 @@ valid_figure_labels = [chr(i) for i in range(ord('a'), ord('z') + 1)]
 figure_names = {}
 
 
-def get_figure(label):
-    if label not in figure_names:
-        raise ValueError(f'There is no such figure with label "{label}".')
-    return figure_names[label]
-
-
 class Figure(ABC):
     def __init__(self, scene, label=None):
         if label is None:
@@ -30,3 +24,11 @@ class Figure(ABC):
     @abstractmethod
     def render(self):
         pass
+
+
+def to_figure(figure: str | Figure):
+    if isinstance(figure, str) and figure not in figure_names:
+        raise ValueError(f'There is no such figure with label "{figure}".')
+    if isinstance(figure, Figure):
+        return figure
+    return figure_names[figure]

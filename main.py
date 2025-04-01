@@ -3,8 +3,6 @@ from random import randrange
 from manim import *
 from utils import *
 
-from math import *
-
 
 def example0():
     triangle('ABC')
@@ -107,8 +105,19 @@ def example9(scene):
     scene.wait(2)
 
 
+def example10(scene):
+    points(('A', -1, 0), ('B', 0, 1))
+    circle((0, 0), 1, 'c')
+
+    arc_midpoint('A', 'B', 'c')
+
+    scene.wait(2)
+
+    move_along_circle('A', 'c')
+
+
 class Main(Scene):
     def construct(self):
         init(scene=self)
 
-        example9(self)
+        example10(self)

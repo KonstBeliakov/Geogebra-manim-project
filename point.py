@@ -125,7 +125,7 @@ class Point:
             run_time=run_time
         )
 
-    def move_along_circle(self, circle, run_time=4, start_angle=None, angle=TAU):
+    def move_along_circle(self, circle: Circle, run_time=4, start_angle=None, angle=TAU):
         center = circle.center
         r = circle.r
 
