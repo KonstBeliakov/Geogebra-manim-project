@@ -116,8 +116,18 @@ def example10(scene):
     move_along_circle('A', 'c')
 
 
+def example11(scene):
+    points(('A', 0, 0), ('B', 1, 1), ('C', -1, 2))
+    triangle('ABC', 'a')
+    inscribed_circle('a', 'O', 'w')
+
+    move('A', 1, -0.8)
+
+    scene.wait(2)
+
+
 class Main(Scene):
     def construct(self):
         init(scene=self)
 
-        example10(self)
+        example11(self)

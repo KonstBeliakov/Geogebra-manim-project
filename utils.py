@@ -458,6 +458,41 @@ def arc_midpoint(p1: str | Point | tuple[int | float, int | float],
 
 
 @on_scene
+def inscribed_circle(triangle: str | Triangle,
+        pointName: str = None,
+        circle_label: str = None):
+    triangle = to_figure(triangle)
+
+    def incenter_and_inradius(triangle):
+        x1, y1 = triangle.p1.x, triangle.p1.y
+        x2, y2 = triangle.p2.x, triangle.p2.y
+        x3, y3 = triangle.p3.x, triangle.p3.y
+
+        # Sides of triangle
+        a = math.hypot(x2 - x3, y2 - y3)
+        b = math.hypot(x1 - x3, y1 - y3)
+        c = math.hypot(x1 - x2, y1 - y2)
+
+        # Half-perimeter
+        p = (a + b + c) / 2
+
+        area = math.sqrt(p * (p - a) * (p - b) * (p - c))
+
+        # inscribed radius
+        r = area / p if p != 0 else 0
+
+        # Center of the circle
+        x_incenter = (a * x1 + b * x2 + c * x3) / (a + b + c)
+        y_incenter = (a * y1 + b * y2 + c * y3) / (a + b + c)
+
+        return (x_incenter, y_incenter), r
+
+    center = Point(_scene, name=pointName, get_position=lambda: incenter_and_inradius(triangle)[0])
+
+    return Circle(_scene, center=center, get_r=lambda: incenter_and_inradius(triangle)[1], label=circle_label)
+
+
+@on_scene
 def point_on_circle(circle, pointName=None):
     cx, cy = circle.center.x, circle.center.y
 
