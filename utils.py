@@ -7,7 +7,7 @@ from manim import TAU
 
 from circle import Circle, get_figure
 from figures import Figure
-from point import Point, get_point_by_name, point_names
+from point import Point, get_point_by_name, point_names, to_point
 from functools import update_wrapper
 
 from segment import Segment
@@ -340,6 +340,69 @@ def move_along_circle(pointName, circle, run_time=4):
     p.move_along_circle(circle,
                         run_time=run_time,
                         angle=TAU)
+
+
+@on_scene
+def tangent(circle: Circle | str,
+                   point: str | Point | tuple[int | float, int | float],
+                   pointNames: tuple[str, str] = (None, None),
+                   segment_labels: tuple[str, str] = (None, None)):
+    if isinstance(circle, str):
+        circle = get_figure(circle)
+    point = to_point(_scene, point)
+
+    def find_tangent_circle_intersections(circle, point):
+        px, py = point.x, point.y
+        cx, cy = circle.center.x, circle.center.y
+        r = circle.r
+
+        dx = px - cx
+        dy = py - cy
+
+        d_sq = dx * dx + dy * dy
+        d = math.sqrt(d_sq)
+
+        # If the point coincides with the center and radius > 0 — tangents are undefined
+        if d == 0:
+            return [None, None]
+
+        # If the external point is inside the circle (d < r) — no tangents exist
+        if d < r:
+            return [None, None]
+
+        # If the external point lies on the circle (d == r) — exactly one tangent,
+        # it "touches" at that same point
+        if abs(d - r) < 1e-12:
+            return [(px, py), None]
+
+        # Case d > r: two tangents
+        # The angle between the line (center -> external point) and the tangent
+        # can be found using arccos(r / d)
+        alpha = math.acos(r / d)
+
+        # The angle of direction from the center to the external point
+        theta = math.atan2(dy, dx)
+
+        # Now calculate the coordinates of the tangent points for angles (theta ± alpha)
+        # Shift them back by adding (cx, cy).
+        # When r/d < 1, the angle delta is valid because acos(r/d) exists.
+        t1_angle = theta + alpha
+        t2_angle = theta - alpha
+
+        x1 = cx + r * math.cos(t1_angle)
+        y1 = cy + r * math.sin(t1_angle)
+        x2 = cx + r * math.cos(t2_angle)
+        y2 = cy + r * math.sin(t2_angle)
+
+        return [(x1, y1), (x2, y2)]
+
+    p1 = Point(_scene, pointNames[0], get_position=lambda: find_tangent_circle_intersections(circle, point)[0])
+    p2 = Point(_scene, pointNames[1], get_position=lambda: find_tangent_circle_intersections(circle, point)[1])
+
+    Segment(_scene, point, p1, label=segment_labels[0])
+    Segment(_scene, point, p2, label=segment_labels[1])
+
+    return [p1, p2]
 
 
 @on_scene

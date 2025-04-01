@@ -101,8 +101,14 @@ def example8(scene):
     move('A', -0.3, -0.3)
 
 
+def example9(scene):
+    circle((0, 0), 1, 'c')
+    tangent('c', (2.3, 1.4))
+    scene.wait(2)
+
+
 class Main(Scene):
     def construct(self):
         init(scene=self)
 
-        example6(self)
+        example9(self)
