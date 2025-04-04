@@ -1,8 +1,9 @@
-import math
 from manim import *
 from figures import *
 from settings import *
 from point import Point, to_point
+from math_utils import *
+
 
 class Circle(Figure):
     def __init__(
@@ -97,29 +98,7 @@ class Circle(Figure):
         p2 = to_point(scene, p2)
         p3 = to_point(scene, p3)
 
-        def get_center_and_radius():
-            x1, y1 = p1.x, p1.y
-            x2, y2 = p2.x, p2.y
-            x3, y3 = p3.x, p3.y
-
-            D = 2 * (x1 * (y2 - y3) +
-                     x2 * (y3 - y1) +
-                     x3 * (y1 - y2))
-            if abs(D) < 1e-9:
-                raise ValueError("The points are collinear or nearly so; cannot define a unique circle.")
-
-            Ux = ((x1 ** 2 + y1 ** 2) * (y2 - y3) +
-                  (x2 ** 2 + y2 ** 2) * (y3 - y1) +
-                  (x3 ** 2 + y3 ** 2) * (y1 - y2)) / D
-
-            Uy = ((x1 ** 2 + y1 ** 2) * (x3 - x2) +
-                  (x2 ** 2 + y2 ** 2) * (x1 - x3) +
-                  (x3 ** 2 + y3 ** 2) * (x2 - x1)) / D
-
-            r = math.sqrt((x1 - Ux) ** 2 + (y1 - Uy) ** 2)
-            return (Ux, Uy), r
-
         # Create a dynamic center point using a lambda that computes the center.
-        center = Point(scene, name=center_name, get_position=lambda: get_center_and_radius()[0])
+        center = Point(scene, name=center_name, get_position=lambda: get_circumscribed_pos_r(p1, p2, p3)[0])
         # Create the circle with a dynamic radius using the get_center_and_radius function.
-        return cls(scene, center=center, get_r=lambda: get_center_and_radius()[1], label=label)
+        return cls(scene, center=center, get_r=lambda: get_circumscribed_pos_r(p1, p2, p3)[1], label=label)

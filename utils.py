@@ -326,6 +326,18 @@ def circumscribed_circle(triangle: str | Triangle, circle_label=None, center_nam
 
 
 @on_scene
+def triangle_center(p1: str | Point | tuple[int | float, int | float],
+                    p2: str | Point | tuple[int | float, int | float],
+                    p3: str | Point | tuple[int | float, int | float],
+                    pointName: str = None):
+    p1 = to_point(_scene, p1)
+    p2 = to_point(_scene, p2)
+    p3 = to_point(_scene, p3)
+
+    return Point(_scene, name=pointName, get_position=tr.get_circumscribed_pos_r(p1, p2, p3))
+
+
+@on_scene
 def move(point: str | Point | tuple[int | float, int | float],
          x: float,
          y: float,
