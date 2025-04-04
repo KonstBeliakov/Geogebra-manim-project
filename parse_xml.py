@@ -55,11 +55,8 @@ def parse(ggb_file):
 
                     elif command_name == 'Intersect':
                         a, b, index_str = inputs.get('a0'), inputs.get('a1'), inputs.get('a2')
-                        index = int(index_str) if index_str else None
-                        if index is not None:
-                            operations.append(f"intersect_figures('{a}', '{b}', '{label}', index={index})")
-                        else:
-                            operations.append(f"intersect_figures('{a}', '{b}', '{label}')")
+                        labels = tuple(outputs.get(f'a{i}', None) for i in range(2))
+                        operations.append(f"intersect_figures('{a}', '{b}', {labels})")
 
                     elif command_name == "Circle":
                         center = inputs.get("a0")
@@ -68,7 +65,7 @@ def parse(ggb_file):
                             radius = float(radius_or_point)
                             operations.append(f"Circle(self, '{center}', {radius}, '{label}')")
                         except ValueError:
-                            operations.append(f"Circle(self, '{center}', '{radius_or_point}', '{label}')")
+                            operations.append(f"Circle.from_three_points(self, '{center}', '{radius_or_point}', '{label}')")
 
                     # New commands
                     elif command_name == 'Line':

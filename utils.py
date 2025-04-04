@@ -281,8 +281,9 @@ def _segment_circle_intersections(segment: Segment, circle: Circle, pointNames: 
         else:
             # Find the roots of the quadratic equation
             sqrt_disc = math.sqrt(discriminant)
-            t1 = (-B + sqrt_disc) / (2 * A)
-            t2 = (-B - sqrt_disc) / (2 * A)
+            # t1 must be < t2
+            t1 = (-B - sqrt_disc) / (2 * A)
+            t2 = (-B + sqrt_disc) / (2 * A)
 
             # Check if the intersection points lie on the segment (t in the range [0,1])
             for t in [t1, t2]:

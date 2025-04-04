@@ -18,7 +18,7 @@ class MyScene(Scene):
 """
     return scene_code
 
-operations = parse_xml.parse("test.ggb")
+operations = parse_xml.parse("usamo2025.ggb")
 
 code = generate_manim_code(operations)
 
