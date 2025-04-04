@@ -74,7 +74,8 @@ def parse(ggb_file):
                             radius = float(radius_or_point)
                             operations.append(f"Circle(self, '{center}', {radius}, '{label}')")
                         except ValueError:
-                            operations.append(f"Circle.from_three_points(self, '{center}', '{radius_or_point}', '{label}')")
+                            p = inputs.get("a2")
+                            operations.append(f"Circle.from_three_points(self, '{center}', '{radius_or_point}', '{p}', '{label}')")
 
                     elif command_name == "Alt":
                         a, b, c = inputs.get('a0'), inputs.get('a1'), inputs.get('a2')
@@ -97,7 +98,7 @@ def parse(ggb_file):
                         abc.sort()
                         str = ''.join(abc)
                         segments = triangle_heights.get(str)
-                        operations.append(f"intersect_figures('{segments[0]}', '{segments[1]}', '{label}')")
+                        operations.append(f"intersect_figures('{segments[0]}', '{segments[1]}', ('{label}'))")
                     # todo
                     elif command_name == 'Line':
                         a, b = inputs.get('a0'), inputs.get('a1')
