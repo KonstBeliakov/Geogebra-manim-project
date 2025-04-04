@@ -1,8 +1,7 @@
 from random import choice
 from abc import ABC, abstractmethod
 
-valid_figure_labels = [chr(i) for i in range(ord('a'), ord('z') + 1)]
-figure_names = {}
+from common import *
 
 
 class Figure(ABC):

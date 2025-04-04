@@ -2,17 +2,18 @@ import math
 from random import uniform
 from math import *
 
-import numpy as np
 from manim import TAU
 
+import common
 from circle import Circle, to_figure
 from figures import Figure
-from point import Point, get_point_by_name, point_names, to_point
-from functools import update_wrapper
+from point import Point, get_point_by_name, to_point
 
 from segment import Segment
 import triangle as tr
 from triangle import Triangle
+from common import *
+from common import _scene, _scaling_coefficient, _global_center
 
 
 def midPoint(scene, p1: Point, p2: Point, name=None):
@@ -65,25 +66,6 @@ def get_altitude_position(vertex, A, B):
     yH = A.y + t * ABy
 
     return xH, yH
-
-
-_scene = None
-_scaling_coefficient = 1
-
-
-def init(scene):
-    global _scene
-    _scene = scene
-
-
-def on_scene(func):
-    def wrapper(*args, **kwargs):
-        if _scene is None:
-            raise Exception(f"Need scene to use function {func.__name__}")
-        return func(*args, **kwargs)
-
-    update_wrapper(wrapper, func)
-    return wrapper
 
 
 def prepare_segment(scene, triangle: str, segment_name: str, point_builder):
@@ -170,9 +152,12 @@ def segment(pointNames: str, label=None):
 
 @on_scene
 def point(name: str, x=None, y=None):
-    return Point(_scene, name,
-                 None if x is None else x / _scaling_coefficient,
-                 None if y is None else y / _scaling_coefficient)
+    if x is not None and y is not None:
+        print('x y:', x, y)
+        print('new x y:', common._new_position(x, y))
+        x, y = common._new_position(x, y)
+
+    return Point(scene=common._scene, name=name, x=x, y=y)
 
 
 @on_scene
@@ -533,29 +518,3 @@ def recenter_camera():
         run_time=2
     )
 '''
-
-
-@on_scene
-def recenter_camera(run_time=2):
-    global _scaling_coefficient
-
-    points = point_names.values()
-    p_x = [point.x for point in points]
-    p_y = [point.y for point in points]
-
-    center = np.array([(max(p_x) + min(p_x)) / 2, (max(p_y) + min(p_y)) / 2, 0])
-    width = max(p_x) - min(p_x) + 2
-    height = max(p_y) - min(p_y) + 2
-
-    new_width = max(width, height * _scene.camera.frame.get_aspect_ratio())
-
-    scaling_factor = new_width / _scene.camera.frame_width
-    _scaling_coefficient *= scaling_factor
-
-    def new_position(x, y):
-        x_new = (x - center[0]) / scaling_factor
-        y_new = (y - center[1]) / scaling_factor
-
-        return x_new, y_new
-
-    move_points(points, [new_position(point.x, point.y) for point in points], run_time=run_time)

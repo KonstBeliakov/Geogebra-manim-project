@@ -2,8 +2,7 @@ from manim import *
 from random import choice, uniform
 from settings import *
 
-valid_point_names = [chr(i) for i in range(ord('A'), ord('Z') + 1)]
-point_names = {}
+from common import *
 
 
 def get_point_by_name(name: str) -> Point:

@@ -1,6 +1,8 @@
 from random import randrange
 
 from manim import *
+
+from common import recenter_camera
 from utils import *
 
 
@@ -38,9 +40,9 @@ def example2():
 
 
 def example3():
-    for i in range(1, 10):
-        point('ABCDEFGHIJ'[i], randrange(-10*i, 10*i), randrange(-10*i, 10*i))
-        recenter_camera()
+    for i in range(10):
+        point('ABCDEFGHIJ'[i], i, i)
+        recenter_camera2()
 
 
 def example4():
@@ -129,5 +131,8 @@ def example11(scene):
 class Main(Scene):
     def construct(self):
         init(scene=self)
+        print(common._scene)
 
-        example11(self)
+        for i in range(10):
+            point('ABCDEFGHIJ'[i], i, i)
+            recenter_camera2()
