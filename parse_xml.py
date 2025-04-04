@@ -9,6 +9,7 @@ def parse(ggb_file):
 
             operations = []
             used = {}
+            triangle_heights = {}
 
             for element in root:
                 if element.tag == "element":
@@ -79,8 +80,24 @@ def parse(ggb_file):
                         a, b, c = inputs.get('a0'), inputs.get('a1'), inputs.get('a2')
                         d = outputs.get('a0')
                         operations.append(f"height('{a + b + c}', '{a + d}')")
+                        abc = [a, b, c]
+                        abc.sort()
+                        str = ''.join(abc)
+                        if str not in triangle_heights:
+                            triangle_heights[str] = []
+                        triangle_heights[str].append(f'{a + d}')
                         used[d] = True
 
+                    elif command_name == "TriangleCenter":
+                        a, b, c, center_type = inputs.get('a0'), inputs.get('a1'), inputs.get('a2'), inputs.get('a3')
+                        label = outputs.get('a0')
+                        if center_type != "4": #todo
+                            continue
+                        abc = [a, b, c]
+                        abc.sort()
+                        str = ''.join(abc)
+                        segments = triangle_heights.get(str)
+                        operations.append(f"intersect_figures('{segments[0]}', '{segments[1]}', '{label}')")
                     # todo
                     elif command_name == 'Line':
                         a, b = inputs.get('a0'), inputs.get('a1')
