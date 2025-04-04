@@ -2,6 +2,8 @@ import circle
 from point import *
 from settings import *
 from utils import *
+from math_utils import *
+from figures import Figure
 
 
 class Triangle(Figure):
@@ -31,33 +33,11 @@ class Triangle(Figure):
         :return: Circle -- circumscribed circle of the triangle
         """
 
-        def get_circumscribed_pos_r(triangle):
-            x1, y1 = triangle.p1.x, triangle.p1.y
-            x2, y2 = triangle.p2.x, triangle.p2.y
-            x3, y3 = triangle.p3.x, triangle.p3.y
-
-            D = 2 * (x1 * (y2 - y3) + x2 * (y3 - y1) + x3 * (y1 - y2))
-
-            if abs(D) < 1e-9:
-                raise ValueError(
-                    f"Triangle {triangle} is degenerate or the points are collinear - cannot define a circumscribed circle.")
-
-            Ux = ((x1 ** 2 + y1 ** 2) * (y2 - y3) +
-                  (x2 ** 2 + y2 ** 2) * (y3 - y1) +
-                  (x3 ** 2 + y3 ** 2) * (y1 - y2)) / D
-
-            Uy = ((x1 ** 2 + y1 ** 2) * (x3 - x2) +
-                  (x2 ** 2 + y2 ** 2) * (x1 - x3) +
-                  (x3 ** 2 + y3 ** 2) * (x2 - x1)) / D
-
-            r = math.sqrt((x1 - Ux) ** 2 + (y1 - Uy) ** 2)
-
-            return (Ux, Uy), r
-
-        center = Point(self.scene, name=point_name, get_position=lambda: get_circumscribed_pos_r(self)[0])
+        center = Point(self.scene, name=point_name,
+                       get_position=lambda: get_circumscribed_pos_r(self.p1, self.p2, self.p3)[0])
 
         circ_circle = circle.Circle(self.scene, center,
-                                    get_r=lambda: get_circumscribed_pos_r(self)[1],
+                                    get_r=lambda: get_circumscribed_pos_r(self.p1, self.p2, self.p3)[1],
                                     label=circle_label)
 
         return circ_circle
