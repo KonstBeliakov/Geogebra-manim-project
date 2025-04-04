@@ -5,6 +5,7 @@ from math import *
 import numpy as np
 from manim import TAU
 
+import figures
 from circle import Circle, to_figure
 from figures import Figure
 from point import Point, get_point_by_name, point_names, to_point
@@ -291,6 +292,8 @@ def _segment_circle_intersections(segment: Segment, circle: Circle, pointNames: 
                     xi = x1 + t * dx
                     yi = y1 + t * dy
                     intersections.append((xi, yi))
+        if len(intersections) == 0:
+            intersections.append(None)
         if len(intersections) == 1:
             intersections.append(None)
         return intersections
@@ -541,22 +544,36 @@ def recenter_camera(run_time=2):
     global _scaling_coefficient
 
     points = point_names.values()
-    p_x = [point.x for point in points]
-    p_y = [point.y for point in points]
+    point_cords = [(p.x, p.y) for p in points if p.x != 10**18 and p.y != 10**18]
 
-    center = np.array([(max(p_x) + min(p_x)) / 2, (max(p_y) + min(p_y)) / 2, 0])
-    width = max(p_x) - min(p_x) + 2
-    height = max(p_y) - min(p_y) + 2
+    for figure in figures.figure_names.values():
+        if isinstance(figure, Circle):
+            x, y, r = figure.center.x, figure.center.y, figure.r
+            point_cords.append((x + r, y))
+            point_cords.append((x - r, y))
+            point_cords.append((x, y - r))
+            point_cords.append((x, y + r))
 
-    new_width = max(width, height * _scene.camera.frame.get_aspect_ratio())
+    min_x = min(p[0] for p in point_cords)
+    max_x = max(p[0] for p in point_cords)
+    min_y = min(p[1] for p in point_cords)
+    max_y = max(p[1] for p in point_cords)
 
-    scaling_factor = new_width / _scene.camera.frame_width
-    _scaling_coefficient *= scaling_factor
+    print(min_x, max_x, min_y, max_y)
+
+    width = (max_x - min_x) / 0.9
+    height = (max_y - min_y) / 0.9
+
+    scale_x = _scene.camera.frame_width / width
+    scale_y = _scene.camera.frame_height / height
+    scale_factor = min(scale_x, scale_y)
+
+    _scaling_coefficient *= scale_factor
 
     def new_position(x, y):
-        x_new = (x - center[0]) / scaling_factor
-        y_new = (y - center[1]) / scaling_factor
-
-        return x_new, y_new
+        return (
+            (x - min_x) * scale_factor - 0.5 * _scene.camera.frame_width * 0.9,
+            (y - min_y) * scale_factor - 0.5 * _scene.camera.frame_height * 0.9
+        )
 
     move_points(points, [new_position(point.x, point.y) for point in points], run_time=run_time)
