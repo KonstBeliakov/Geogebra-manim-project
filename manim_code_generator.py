@@ -13,6 +13,8 @@ from utils import *
 
 class MyScene(Scene):
     def construct(self):
+        init(self)
+        recenter_camera()
 {''.join([f'        {line}{nl}' for line in code_lines])}
         self.wait(1)
 """

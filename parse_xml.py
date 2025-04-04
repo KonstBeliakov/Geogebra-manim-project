@@ -12,7 +12,7 @@ def parse(ggb_file):
 
             for element in root:
                 if element.tag == "element":
-                    label = element.get("label")
+                    label = element.get("label").replace("'", "\\'")
                     if label in used:
                         continue
                     used[label] = True
@@ -30,18 +30,22 @@ def parse(ggb_file):
                     command_name = element.get("name")
                     inputs = element.find("input")
                     outputs = element.find("output")
-                    label = outputs.get('a0') if outputs is not None else None
 
-                    if label and label not in used:
-                        used[label] = True
+                    for attr in inputs.attrib:
+                        inputs.attrib[attr] = inputs.attrib[attr].replace("'", "\\'")
 
-                    # Existing commands
+                    for attr in outputs.attrib:
+                        outputs.attrib[attr] = outputs.attrib[attr].replace("'", "\\'")
                     if command_name == 'Segment':
                         a, b = inputs.get('a0'), inputs.get('a1')
+                        label = outputs.get('a0')
+                        used[label] = True
                         operations.append(f"Segment(self, '{a}', '{b}', '{label}')")
 
                     elif command_name == 'Midpoint':
                         a, b = inputs.get('a0'), inputs.get('a1')
+                        label = outputs.get('a0')
+                        used[label] = True
                         operations.append(f"midPoint(self, '{a}', '{b}', '{label}')")
 
                     elif command_name == 'Polygon':
@@ -56,60 +60,81 @@ def parse(ggb_file):
                     elif command_name == 'Intersect':
                         a, b, index_str = inputs.get('a0'), inputs.get('a1'), inputs.get('a2')
                         labels = tuple(outputs.get(f'a{i}', None) for i in range(2))
+                        for label in labels:
+                            used[label] = True
                         operations.append(f"intersect_figures('{a}', '{b}', {labels})")
 
                     elif command_name == "Circle":
                         center = inputs.get("a0")
                         radius_or_point = inputs.get("a1")
+                        label = outputs.get('a0')
+                        used[label] = True
                         try:
                             radius = float(radius_or_point)
                             operations.append(f"Circle(self, '{center}', {radius}, '{label}')")
                         except ValueError:
                             operations.append(f"Circle.from_three_points(self, '{center}', '{radius_or_point}', '{label}')")
 
-                    # New commands
+                    elif command_name == "Alt":
+                        a, b, c = inputs.get('a0'), inputs.get('a1'), inputs.get('a2')
+                        d = outputs.get('a0')
+                        operations.append(f"height('{a + b + c}', '{a + d}')")
+                        used[d] = True
+
+                    # todo
                     elif command_name == 'Line':
                         a, b = inputs.get('a0'), inputs.get('a1')
+                        label = outputs.get('a0')
+                        used[label] = True
                         operations.append(f"Line(self, '{a}', '{b}', '{label}')")
 
                     elif command_name == 'Ray':
                         a, b = inputs.get('a0'), inputs.get('a1')
+                        label = outputs.get('a0')
+                        used[label] = True
                         operations.append(f"Ray(self, '{a}', '{b}', '{label}')")
 
                     elif command_name == 'Vector':
                         a, b = inputs.get('a0'), inputs.get('a1')
+                        label = outputs.get('a0')
+                        used[label] = True
                         operations.append(f"Vector(self, '{a}', '{b}', '{label}')")
 
                     elif command_name == 'PerpendicularLine':
                         point, line = inputs.get('a0'), inputs.get('a1')
+                        label = outputs.get('a0')
+                        used[label] = True
                         operations.append(f"PerpendicularLine(self, '{point}', '{line}', '{label}')")
 
                     elif command_name == 'ParallelLine':
                         point, line = inputs.get('a0'), inputs.get('a1')
+                        label = outputs.get('a0')
+                        used[label] = True
                         operations.append(f"ParallelLine(self, '{point}', '{line}', '{label}')")
 
                     elif command_name == 'Angle':
                         a, b, c = inputs.get('a0'), inputs.get('a1'), inputs.get('a2')
+                        label = outputs.get('a0')
+                        used[label] = True
                         operations.append(f"Angle(self, '{a}', '{b}', '{c}', '{label}')")
 
                     elif command_name == 'Ellipse':
                         f1, f2, point = inputs.get('a0'), inputs.get('a1'), inputs.get('a2')
+                        label = outputs.get('a0')
+                        used[label] = True
                         operations.append(f"Ellipse(self, '{f1}', '{f2}', '{point}', '{label}')")
 
                     elif command_name == 'Hyperbola':
                         f1, f2, point = inputs.get('a0'), inputs.get('a1'), inputs.get('a2')
+                        label = outputs.get('a0')
+                        used[label] = True
                         operations.append(f"Hyperbola(self, '{f1}', '{f2}', '{point}', '{label}')")
 
                     elif command_name == 'Parabola':
                         focus, directrix = inputs.get('a0'), inputs.get('a1')
+                        label = outputs.get('a0')
+                        used[label] = True
                         operations.append(f"Parabola(self, '{focus}', '{directrix}', '{label}')")
 
-                    elif command_name == 'Function':
-                        expression = element.find("expression").get("exp")
-                        operations.append(f"Function(self, '{expression}', '{label}')")
-
-                    elif command_name == 'Text':
-                        value = inputs.get('a0')  # Text content might be a reference or literal
-                        operations.append(f"Text(self, '{value}', '{label}')")
 
     return operations
