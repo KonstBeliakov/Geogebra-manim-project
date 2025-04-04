@@ -75,8 +75,13 @@ def parse(ggb_file):
                         except ValueError:
                             operations.append(f"Circle.from_three_points(self, '{center}', '{radius_or_point}', '{label}')")
 
+                    elif command_name == "Alt":
+                        a, b, c = inputs.get('a0'), inputs.get('a1'), inputs.get('a2')
+                        d = outputs.get('a0')
+                        operations.append(f"height('{a + b + c}', '{a + d}')")
+                        used[d] = True
 
-                    # New commands
+                    # todo
                     elif command_name == 'Line':
                         a, b = inputs.get('a0'), inputs.get('a1')
                         label = outputs.get('a0')
