@@ -3,6 +3,7 @@ from point import *
 from settings import *
 from utils import *
 from math_utils import *
+from figures import Figure
 
 
 class Triangle(Figure):

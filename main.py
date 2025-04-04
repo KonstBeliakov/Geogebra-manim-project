@@ -109,7 +109,7 @@ def example10(scene):
     points(('A', -1, 0), ('B', 0, 1))
     circle((0, 0), 1, 'c')
 
-    arc_midpoint('A', 'B', 'c')
+    arc_midpoint_pos('A', 'B', 'c')
 
     scene.wait(2)
 
@@ -130,4 +130,4 @@ class Main(Scene):
     def construct(self):
         init(scene=self)
 
-        example11(self)
+        example4()
