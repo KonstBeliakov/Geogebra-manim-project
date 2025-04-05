@@ -2,6 +2,7 @@ from functools import update_wrapper
 from math import *
 from random import uniform
 
+import numpy as np
 from manim import TAU
 
 import figures

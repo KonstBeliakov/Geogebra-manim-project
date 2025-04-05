@@ -1,3 +1,5 @@
+import math
+
 from figures import *
 from point import *
 from settings import *
@@ -19,6 +21,10 @@ class Segment(Figure):
         self.p2 = to_point(scene, p2)
 
         super().__init__(scene, label=label)
+
+    @property
+    def length(self):
+        return math.hypot(self.p1.x - self.p2.x, self.p1.y - self.p2.y)
 
     def render(self):
         self.line = always_redraw(lambda: Line(tuple(self.p1), tuple(self.p2), color=LINES_COLOR))
