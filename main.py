@@ -1,6 +1,8 @@
 from random import randrange
 
 from manim import *
+
+from tick import Tick
 from utils import *
 
 
@@ -126,8 +128,35 @@ def example11(scene):
     scene.wait(2)
 
 
+def example12(scene):
+    circle((0, 0), 1, 'c')
+    point('A', 2.3, 1.4)
+    tangent('c', 'A', segment_labels=('a', 'b'))
+
+    mark_equals('a', 'b')
+
+    move('A', 1.4, -2)
+
+    scene.wait(2)
+
+
+def example13(scene):
+    for i in range(3):
+        for j in range(3):
+            point(f'A{i}{j}', i, j)
+
+    for i in range(2):
+        for j in range(2):
+            segment((f'A{i}{j}', f'A{i}{j+1}'), f'a{i}{j}_1')
+            segment((f'A{i}{j}', f'A{i + 1}{j}'), f'a{i}{j}_2')
+
+    mark_all_equal_to(f'a00_1')
+
+    scene.wait(2)
+
+
 class Main(Scene):
     def construct(self):
         init(scene=self)
 
-        example4()
+        example12(self)

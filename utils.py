@@ -12,6 +12,7 @@ from figures import Figure
 from math_utils import *
 from point import Point, get_point_by_name, point_names, to_point
 from segment import Segment
+from tick import Tick
 from triangle import Triangle
 
 
@@ -328,3 +329,18 @@ def recenter_camera(run_time=2):
         )
 
     move_points(points, [new_position(point.x, point.y) for point in points], run_time=run_time)
+
+
+@on_scene
+def mark_equals(segments: list[str | Segment]):
+    for segment in segments:
+        Tick(_scene, segment, segments[0])
+
+
+@on_scene
+def mark_all_equal_to(segment: str | Segment):
+    segment = to_figure(segment)
+
+    for figure in figures.figure_names.values():
+        if isinstance(figure, Segment) and abs(segment.length - figure.length) < 1e-12:
+            Tick(_scene, segment=figure, base_segment=segment)
