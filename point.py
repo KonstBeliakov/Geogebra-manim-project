@@ -97,6 +97,12 @@ class Point:
             return self._get_position()[1]
         return self.y_tracker.get_value()
 
+    @property
+    def active(self):
+        if self._get_position is not None:
+            return self._get_position() is not None
+        return True
+
     def render(self):
         self.circle = Circle(radius=0.05, color=LINES_COLOR, fill_opacity=1)
         self.circle.move_to((self.x, self.y, 0))

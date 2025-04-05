@@ -292,7 +292,7 @@ def recenter_camera(run_time=2):
     global _scaling_coefficient
 
     points = point_names.values()
-    point_cords = [(p.x, p.y) for p in points if p.x != 10 ** 18 and p.y != 10 ** 18]
+    point_cords = [(p.x, p.y) for p in points if p.active]
 
     for figure in figures.figure_names.values():
         if isinstance(figure, Circle):
@@ -309,8 +309,10 @@ def recenter_camera(run_time=2):
 
     print(min_x, max_x, min_y, max_y)
 
-    width = (max_x - min_x) / 0.9
-    height = (max_y - min_y) / 0.9
+    screen_scale = 0.9  # size of the screen without borders (border size is 0.1 of the screen)
+
+    width = (max_x - min_x) / screen_scale
+    height = (max_y - min_y) / screen_scale
 
     scale_x = _scene.camera.frame_width / width
     scale_y = _scene.camera.frame_height / height
@@ -320,8 +322,8 @@ def recenter_camera(run_time=2):
 
     def new_position(x, y):
         return (
-            (x - min_x) * scale_factor - 0.5 * _scene.camera.frame_width * 0.9,
-            (y - min_y) * scale_factor - 0.5 * _scene.camera.frame_height * 0.9
+            (x - min_x) * scale_factor - 0.5 * _scene.camera.frame_width * screen_scale,
+            (y - min_y) * scale_factor - 0.5 * _scene.camera.frame_height * screen_scale
         )
 
     move_points(points, [new_position(point.x, point.y) for point in points], run_time=run_time)
