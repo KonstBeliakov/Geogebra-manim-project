@@ -112,6 +112,16 @@ def triangle(pointNames: str, label=None):
 
 
 @on_scene
+def mirror_point(scene, p: str | Point, m: str | Point, name=None):
+    p = to_point(scene, p)
+    m = to_point(scene, m)
+    def get_position():
+        return 2 * m.x - p.x, 2 * m.y - p.y
+
+    return Point(scene, name=name, get_position=get_position)
+
+
+@on_scene
 def circle(center=None, r=1, label=None):
     return Circle(_scene, center=center, r=r, label=label)
 

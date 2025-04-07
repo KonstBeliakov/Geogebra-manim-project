@@ -37,6 +37,7 @@ def parse(ggb_file):
 
                     for attr in outputs.attrib:
                         outputs.attrib[attr] = outputs.attrib[attr].replace("'", "\\'")
+
                     if command_name == 'Segment':
                         a, b = inputs.get('a0'), inputs.get('a1')
                         label = outputs.get('a0')
@@ -94,11 +95,17 @@ def parse(ggb_file):
                         label = outputs.get('a0')
                         if center_type != "4": #todo
                             continue
+                        used[label] = True
                         abc = [a, b, c]
                         abc.sort()
                         str = ''.join(abc)
                         segments = triangle_heights.get(str)
                         operations.append(f"intersect_figures('{segments[0]}', '{segments[1]}', ('{label}'))")
+
+                    elif command_name == "Mirror":
+                        a, b = inputs.get('a0'), inputs.get('a1')
+                        label = outputs.get('a0')
+                        operations.append(f"mirror_point(self, '{a}', '{b}', '{label}')")
                     # todo
                     elif command_name == 'Line':
                         a, b = inputs.get('a0'), inputs.get('a1')
