@@ -1,22 +1,29 @@
 import xml.etree.ElementTree as ET
 import zipfile
 
+
 def get_coordinates(ggb_file):
     with zipfile.ZipFile(ggb_file, 'r') as z:
         with z.open('geogebra.xml') as xml_file:
             tree = ET.parse(xml_file)
-            root = tree.getroot()
+            root = tree.getroot().find("construction")
 
-            coords = []
+            coordinates = []
+
+            eps = 1e-9
 
             for element in root:
-                if element.tag == 'element':
+                if element.tag == "element":
+                    element_type = element.get('type')
                     if element_type == 'point':
+                        coords = element.find("coords")
                         x, y, z = float(coords.get("x")), float(coords.get("y")), float(coords.get("z"))
-                        coords.append([x, y, z])
+                        if abs(z) < eps:
+                            continue
+                        coordinates.append((x / z, y / z))
 
-            return coords
-        
+            return coordinates
+
 def parse(ggb_file):
     with zipfile.ZipFile(ggb_file, 'r') as z:
         with z.open('geogebra.xml') as xml_file:
