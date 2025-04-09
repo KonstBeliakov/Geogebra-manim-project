@@ -22,8 +22,8 @@ def midPoint(scene, p1: Point, p2: Point, name=None):
 
 
 _scene = None
-_scaling_coefficient = 1
 _new_position = lambda x, y: (x, y)
+
 
 def init(scene):
     global _scene
@@ -116,6 +116,7 @@ def triangle(pointNames: str, label=None):
 def mirror_point(scene, p: str | Point, m: str | Point, name=None):
     p = to_point(scene, p)
     m = to_point(scene, m)
+
     def get_position():
         return 2 * m.x - p.x, 2 * m.y - p.y
 
@@ -174,8 +175,9 @@ def _circle_intersection(circle1, circle2, pointNames: tuple[str, str] = (None, 
 
 @on_scene
 def _segment_circle_intersections(segment: Segment, circle: Circle, pointNames: tuple[str, str] = (None, None)):
-    return [Point(_scene, pointNames[0], get_position=lambda: segment_circle_intersection_positions(segment, circle)[0]),
-            Point(_scene, pointNames[1], get_position=lambda: segment_circle_intersection_positions(segment, circle)[1])]
+    return [
+        Point(_scene, pointNames[0], get_position=lambda: segment_circle_intersection_positions(segment, circle)[0]),
+        Point(_scene, pointNames[1], get_position=lambda: segment_circle_intersection_positions(segment, circle)[1])]
 
 
 @on_scene
@@ -302,7 +304,7 @@ def move_points(points, positions, run_time=2):
 
 @on_scene
 def recenter_camera(point_cords=None, run_time=2):
-    global _new_position, _scaling_coefficient
+    global _new_position
 
     points = point_names.values()
 
@@ -318,28 +320,39 @@ def recenter_camera(point_cords=None, run_time=2):
                 point_cords.append((x, y - r))
                 point_cords.append((x, y + r))
 
-    min_x = min(p[0] for p in point_cords)
-    max_x = max(p[0] for p in point_cords)
-    min_y = min(p[1] for p in point_cords)
-    max_y = max(p[1] for p in point_cords)
+    #min_x = min(p[0] for p in point_cords)
+    #max_x = max(p[0] for p in point_cords)
+    #min_y = min(p[1] for p in point_cords)
+    #max_y = max(p[1] for p in point_cords)
 
-    print(min_x, max_x, min_y, max_y)
+    #screen_scale = 0.9  # size of the screen without borders (border size is 0.1 of the screen)
 
-    screen_scale = 0.9  # size of the screen without borders (border size is 0.1 of the screen)
+    #width = (max_x - min_x) / screen_scale
+    #height = (max_y - min_y) / screen_scale
 
-    width = (max_x - min_x) / screen_scale
-    height = (max_y - min_y) / screen_scale
+    #center = (
+    #    min_x + width / 2,
+    #    min_y + height / 2
+    #)
 
     center = (
-        min_x + width / 2,
-        min_y + height / 2
+        sum([p[0] for p in point_cords]) / len(point_cords),
+        sum([p[1] for p in point_cords]) / len(point_cords)
     )
 
-    scale_x = _scene.camera.frame_width / width
-    scale_y = _scene.camera.frame_height / height
-    scale_factor = min(scale_x, scale_y)
+    #scale_x = _scene.camera.frame_width / width
+    #scale_y = _scene.camera.frame_height / height
 
-    _scaling_coefficient *= scale_factor
+    dx = max([abs(p[0] - center[0]) for p in point_cords])
+    dy = max([abs(p[1] - center[1]) for p in point_cords])
+
+    dx_new = _scene.camera.frame_width / 2
+    dy_new = _scene.camera.frame_height / 2
+
+    scale_x = dx_new / dx
+    scale_y = dy_new / dy
+
+    scale_factor = min(scale_x, scale_y)
 
     def new_position(x, y):
         return (

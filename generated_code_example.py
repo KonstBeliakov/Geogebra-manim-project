@@ -2,22 +2,25 @@ from manim import *
 from point import *
 from segment import *
 from utils import *
+from parse_xml import get_coordinates
+
 
 class MyScene(Scene):
     def construct(self):
         init(self)
-        recenter_camera()
-        Point(self, 'A', -14.947803120349704, 13.312261154757058)
-        Point(self, 'B', -18.722496317277116, 1.7784763863677011)
-        Point(self, 'C', -4.4625442399957835, 1.7784763863677011)
+        recenter_camera(point_cords=get_coordinates('usamo2025.ggb'))
+
+        point('A', -14.947803120349704, 13.312261154757058)
+        point('B', -18.722496317277116, 1.7784763863677011)
+        point('C', -4.4625442399957835, 1.7784763863677011)
         Segment(self, 'A', 'B', 't1')
         Segment(self, 'B', 'C', 'c')
         Segment(self, 'C', 'A', 'a')
         height('ABC', 'AD')
         height('CAB', 'CE')
-        intersect_figures('AD', 'CE', ('H'))
-        Point(self, 'H', -14.947803120349704, 5.210015656301699)
-        Point(self, 'H\'', -14.947803120349704, -1.653062883566297)
+        intersect_figures('AD', 'CE', ('H', 'X'))  # Now this is a valid code
+
+        point('H\'', -14.947803120349704, -1.653062883566297)
         Circle.from_three_points(self, 'A', 'E', 'H\'', 'd')
         intersect_figures('d', 'a', ('F', 'G'))
         Segment(self, 'H', 'D', 'h')
