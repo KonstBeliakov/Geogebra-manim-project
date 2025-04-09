@@ -1,6 +1,29 @@
 import xml.etree.ElementTree as ET
 import zipfile
 
+
+def get_coordinates(ggb_file):
+    with zipfile.ZipFile(ggb_file, 'r') as z:
+        with z.open('geogebra.xml') as xml_file:
+            tree = ET.parse(xml_file)
+            root = tree.getroot().find("construction")
+
+            coordinates = []
+
+            eps = 1e-9
+
+            for element in root:
+                if element.tag == "element":
+                    element_type = element.get('type')
+                    if element_type == 'point':
+                        coords = element.find("coords")
+                        x, y, z = float(coords.get("x")), float(coords.get("y")), float(coords.get("z"))
+                        if abs(z) < eps:
+                            continue
+                        coordinates.append((x / z, y / z))
+
+            return coordinates
+
 def parse(ggb_file):
     with zipfile.ZipFile(ggb_file, 'r') as z:
         with z.open('geogebra.xml') as xml_file:
@@ -37,6 +60,7 @@ def parse(ggb_file):
 
                     for attr in outputs.attrib:
                         outputs.attrib[attr] = outputs.attrib[attr].replace("'", "\\'")
+
                     if command_name == 'Segment':
                         a, b = inputs.get('a0'), inputs.get('a1')
                         label = outputs.get('a0')
@@ -94,11 +118,17 @@ def parse(ggb_file):
                         label = outputs.get('a0')
                         if center_type != "4": #todo
                             continue
+                        used[label] = True
                         abc = [a, b, c]
                         abc.sort()
                         str = ''.join(abc)
                         segments = triangle_heights.get(str)
                         operations.append(f"intersect_figures('{segments[0]}', '{segments[1]}', ('{label}'))")
+
+                    elif command_name == "Mirror":
+                        a, b = inputs.get('a0'), inputs.get('a1')
+                        label = outputs.get('a0')
+                        operations.append(f"mirror_point(self, '{a}', '{b}', '{label}')")
                     # todo
                     elif command_name == 'Line':
                         a, b = inputs.get('a0'), inputs.get('a1')

@@ -1,5 +1,6 @@
 import parse_xml
 
+
 def generate_manim_code(operations):
     code_lines = []
     for op in operations:
@@ -20,9 +21,13 @@ class MyScene(Scene):
 """
     return scene_code
 
-operations = parse_xml.parse("usamo2025.ggb")
+input_file = "usamo2025.ggb"
+output_file = "generated_code_example"
+
+
+operations = parse_xml.parse(input_file)
 
 code = generate_manim_code(operations)
 
-with open("generated_code_example.py", "w") as file:
+with open(output_file, "w") as file:
     file.write(code)
