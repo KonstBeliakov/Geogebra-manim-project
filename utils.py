@@ -6,6 +6,7 @@ import numpy as np
 from manim import TAU
 
 import figures
+import settings
 import triangle as tr
 from circle import Circle, to_figure
 from figures import Figure
@@ -22,7 +23,7 @@ def midPoint(scene, p1: Point, p2: Point, name=None):
 
 _scene = None
 _scaling_coefficient = 1
-
+_new_position = lambda x, y: (x, y)
 
 def init(scene):
     global _scene
@@ -124,8 +125,8 @@ def segment(pointNames: str, label=None):
 @on_scene
 def point(name: str, x=None, y=None):
     return Point(_scene, name,
-                 None if x is None else x / _scaling_coefficient,
-                 None if y is None else y / _scaling_coefficient)
+                 None if x is None else _new_position(x, y)[0],
+                 None if y is None else _new_position(x, y)[1])
 
 
 @on_scene
@@ -290,19 +291,22 @@ def move_points(points, positions, run_time=2):
 
 
 @on_scene
-def recenter_camera(run_time=2):
-    global _scaling_coefficient
+def recenter_camera(point_cords=None, run_time=2):
+    global _new_position, _scaling_coefficient
 
     points = point_names.values()
-    point_cords = [(p.x, p.y) for p in points if p.active]
 
-    for figure in figures.figure_names.values():
-        if isinstance(figure, Circle):
-            x, y, r = figure.center.x, figure.center.y, figure.r
-            point_cords.append((x + r, y))
-            point_cords.append((x - r, y))
-            point_cords.append((x, y - r))
-            point_cords.append((x, y + r))
+    if point_cords is None:
+        point_cords = [(p.x, p.y) for p in points if p.active]
+
+    if settings.recenter_with_circles:
+        for figure in figures.figure_names.values():
+            if isinstance(figure, Circle):
+                x, y, r = figure.center.x, figure.center.y, figure.r
+                point_cords.append((x + r, y))
+                point_cords.append((x - r, y))
+                point_cords.append((x, y - r))
+                point_cords.append((x, y + r))
 
     min_x = min(p[0] for p in point_cords)
     max_x = max(p[0] for p in point_cords)
@@ -316,6 +320,11 @@ def recenter_camera(run_time=2):
     width = (max_x - min_x) / screen_scale
     height = (max_y - min_y) / screen_scale
 
+    center = (
+        min_x + width / 2,
+        min_y + height / 2
+    )
+
     scale_x = _scene.camera.frame_width / width
     scale_y = _scene.camera.frame_height / height
     scale_factor = min(scale_x, scale_y)
@@ -324,11 +333,14 @@ def recenter_camera(run_time=2):
 
     def new_position(x, y):
         return (
-            (x - min_x) * scale_factor - 0.5 * _scene.camera.frame_width * screen_scale,
-            (y - min_y) * scale_factor - 0.5 * _scene.camera.frame_height * screen_scale
+            (x - center[0]) * scale_factor,
+            (y - center[1]) * scale_factor
         )
 
-    move_points(points, [new_position(point.x, point.y) for point in points], run_time=run_time)
+    _new_position = new_position
+
+    if points:
+        move_points(points, [new_position(point.x, point.y) for point in points], run_time=run_time)
 
 
 @on_scene
