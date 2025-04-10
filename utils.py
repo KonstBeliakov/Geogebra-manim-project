@@ -2,7 +2,6 @@ from functools import update_wrapper
 from math import *
 from random import uniform
 
-import numpy as np
 from manim import TAU
 
 import figures
@@ -112,15 +111,146 @@ def triangle(pointNames: str, label=None):
     return tr.Triangle(scene=_scene, p1=pointNames[0], p2=pointNames[1], p3=pointNames[2], label=label)
 
 
+def line_coefficients(p1: Point, p2: Point) -> tuple[float, float, float]:
+    """
+    Returns the coefficients (A, B, C) of the line Ax + By + C = 0
+    passing through the points p1(x1, y1) and p2(x2, y2).
+    """
+    x1, y1 = p1.x, p1.y
+    x2, y2 = p2.x, p2.y
+    # Line equation through (x1, y1) and (x2, y2):
+    # A = (y2 - y1), B = (x1 - x2), C = x2*y1 - x1*y2
+    A = y2 - y1
+    B = x1 - x2
+    C = x2 * y1 - x1 * y2
+    return A, B, C
+
+
 @on_scene
-def mirror_point(scene, p: str | Point, m: str | Point, name=None):
-    p = to_point(scene, p)
-    m = to_point(scene, m)
+def mirror_point(
+        point: str | Point | tuple,
+        center: str | Point | tuple,
+        name: str = None
+) -> Point:
+    """
+    Creates a new point — the reflection of the point 'point'
+    with respect to the point 'center'.
+    """
+    p = to_point(_scene, point)
+    c = to_point(_scene, center)
 
     def get_position():
-        return 2 * m.x - p.x, 2 * m.y - p.y
+        return 2 * c.x - p.x, 2 * c.y - p.y
 
-    return Point(scene, name=name, get_position=get_position)
+    return Point(_scene, name=name, get_position=get_position)
+
+
+@on_scene
+def reflect_figure_about_point(
+        figure: str | Figure,
+        reflection_center: str | Point | tuple,
+        new_figure_label: str = None
+) -> Figure:
+    """
+    Reflects a given geometric figure (circle, segment, triangle)
+    with respect to the point 'reflection_center'. Returns a new figure.
+    """
+    figure = to_figure(figure)
+    center = to_point(_scene, reflection_center)
+
+    if isinstance(figure, Circle):
+        new_center = mirror_point(figure.center, center)
+        return Circle(
+            _scene,
+            center=new_center,
+            get_r=figure._get_radius,
+            label=new_figure_label
+        )
+    if isinstance(figure, Segment):
+        new_p1 = mirror_point(figure.p1, center)
+        new_p2 = mirror_point(figure.p2, center)
+        return Segment(_scene, new_p1, new_p2, label=new_figure_label)
+    if isinstance(figure, Triangle):
+        new_p1 = mirror_point(figure.p1, center)
+        new_p2 = mirror_point(figure.p2, center)
+        new_p3 = mirror_point(figure.p3, center)
+        return Triangle(
+            _scene,
+            p1=new_p1,
+            p2=new_p2,
+            p3=new_p3,
+            label=new_figure_label
+        )
+
+
+@on_scene
+def reflect_point_about_line(
+        point: str | Point | tuple,
+        reflection_line: str | Segment,
+        name: str = None
+) -> Point:
+    """
+    Reflects the point 'point' about the line defined by the segment 'reflection_line'.
+    The reflection uses the infinite line passing through the endpoints of the segment.
+    Returns a new point.
+    """
+    p = to_point(_scene, point)
+    line_segment = to_figure(reflection_line)
+
+    if not isinstance(line_segment, Segment):
+        raise TypeError(f"The argument reflection_line must be a Segment, not {type(line_segment)}.")
+
+    A, B, C = line_coefficients(line_segment.p1, line_segment.p2)
+
+    def get_position():
+        x0, y0 = p.x, p.y
+        denom = A * A + B * B
+        # Formula for reflection of a point (x0, y0) about the line A x + B y + C = 0:
+        # x' = x0 - 2A(A*x0 + B*y0 + C)/(A^2 + B^2)
+        # y' = y0 - 2B(A*x0 + B*y0 + C)/(A^2 + B^2)
+        factor = 2 * (A * x0 + B * y0 + C) / denom
+        xr = x0 - factor * A
+        yr = y0 - factor * B
+        return xr, yr
+
+    return Point(_scene, name=name, get_position=get_position)
+
+
+@on_scene
+def reflect_figure_about_line(
+        figure: Figure | str,
+        reflection_line: str | Segment,
+        new_figure_label: str = None
+) -> Figure:
+    """
+    Reflects the given figure about the infinite line
+    passing through the endpoints of the segment 'reflection_line'.
+    Returns a new figure.
+    """
+    figure = to_figure(figure)
+    line_segment = to_figure(reflection_line)
+
+    if not isinstance(line_segment, Segment):
+        raise TypeError(f"The argument reflection_line must be a Segment, not {type(line_segment)}.")
+
+    if isinstance(figure, Circle):
+        new_center = reflect_point_about_line(figure.center, line_segment)
+        return Circle(_scene, center=new_center, get_r=figure._get_radius, label=new_figure_label)
+    if isinstance(figure, Segment):
+        new_p1 = reflect_point_about_line(figure.p1, line_segment)
+        new_p2 = reflect_point_about_line(figure.p2, line_segment)
+        return Segment(_scene, new_p1, new_p2, label=new_figure_label)
+    if isinstance(figure, Triangle):
+        new_p1 = reflect_point_about_line(figure.p1, line_segment)
+        new_p2 = reflect_point_about_line(figure.p2, line_segment)
+        new_p3 = reflect_point_about_line(figure.p3, line_segment)
+        return Triangle(
+            _scene,
+            p1=new_p1,
+            p2=new_p2,
+            p3=new_p3,
+            label=new_figure_label
+        )
 
 
 @on_scene

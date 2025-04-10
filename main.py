@@ -133,7 +133,7 @@ def example12(scene):
     point('A', 2.3, 1.4)
     tangent('c', 'A', segment_labels=('a', 'b'))
 
-    mark_equals('a', 'b')
+    mark_equals(['a', 'b'])
 
     move('A', 1.4, -2)
 
@@ -179,8 +179,49 @@ def example14(scene):
     scene.wait(5)
 
 
+def example15(scene):
+    """
+    Testing reflection functions (reflecting about a point)
+    """
+    point('A', 0, 0)
+
+    point('B', 2, 1)
+    mirror_point('B', 'A')
+
+    points(('C', 0.5, 0.5), ('D', 1, 0.5), ('E', 0.5, 1))
+
+    triangle('CDE', 't')
+
+    reflect_figure_about_point('t', 'A')
+
+    scene.wait(2)
+
+
+def example16(scene):
+    """
+    Testing a reflection function (reflection about a line)
+    """
+    point('F', 0, 0)
+    point('G', 4, 0)
+    segment('FG', 'line')
+
+    point('H', 2, 2)
+    reflect_point_about_line('H', 'FG', 'H\'')
+
+    points(('I', 1, 1), ('J', 2, 3), ('K', 3, 1))
+    triangle('IJK', 'triangle')
+    reflect_figure_about_line('triangle', 'FG', 'triangle_reflected')
+
+    point('L', 1.5, -1.5)
+    point('M', 2.5, -1.5)
+    segment('LM', 'seg')
+    reflect_figure_about_line('seg', 'FG', 'seg_reflected')
+
+    scene.wait(2)
+
+
 class Main(Scene):
     def construct(self):
         init(scene=self)
 
-        example14(self)
+        example16(self)
