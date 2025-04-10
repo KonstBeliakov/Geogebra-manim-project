@@ -106,15 +106,15 @@ class Point:
     def render(self):
         self.circle = Circle(radius=0.05, color=LINES_COLOR, fill_opacity=1)
         self.circle.move_to((self.x, self.y, 0))
-        self.scene.play(Create(self.circle))
-        self.scene.wait(0.3)
+        self.scene.play(Create(self.circle), run_time=point_render_time)
+        self.scene.wait(point_delay)
         self.circle.add_updater(lambda m: m.move_to((self.x, self.y, 0)))
         self.scene.add(self.circle)
 
         self.point_name_text = Text(self.name, font_size=30)
         self.point_name_text.move_to((self.x, self.y + 0.3, 0))
-        self.scene.play(Write(self.point_name_text))
-        self.scene.wait(0.3)
+        self.scene.play(Write(self.point_name_text), run_time=point_label_render_time)
+        self.scene.wait(point_delay)
         self.point_name_text.add_updater(lambda m: m.move_to((self.x, self.y + 0.3, 0)))
         self.scene.add(self.point_name_text)
 

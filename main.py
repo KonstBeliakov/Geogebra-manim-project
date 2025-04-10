@@ -15,9 +15,9 @@ def example0():
 def example1():
     points(('A', 0, 0), 'B', 'C')
 
-    triangle(('A','B', 'C'))
+    triangle(('A', 'B', 'C'))
 
-    median(('A', 'B', 'C'),  ('B', 'M'))
+    median(('A', 'B', 'C'), ('B', 'M'))
     bisector('ABC', 'BD')
     height('ABC', 'AH')
 
@@ -41,13 +41,13 @@ def example2():
 
 def example3():
     for i in range(1, 10):
-        point('ABCDEFGHIJ'[i], randrange(-10*i, 10*i), randrange(-10*i, 10*i))
+        point('ABCDEFGHIJ'[i], randrange(-10 * i, 10 * i), randrange(-10 * i, 10 * i))
         recenter_camera()
 
 
 def example4():
-    circle((0,0), 2, 'a')
-    circle((3,0), 3, 'b')
+    circle((0, 0), 2, 'a')
+    circle((3, 0), 3, 'b')
 
     intersect_figures('a', 'b', ('A', 'B'))
 
@@ -147,7 +147,7 @@ def example13(scene):
 
     for i in range(2):
         for j in range(2):
-            segment((f'A{i}{j}', f'A{i}{j+1}'), f'a{i}{j}_1')
+            segment((f'A{i}{j}', f'A{i}{j + 1}'), f'a{i}{j}_1')
             segment((f'A{i}{j}', f'A{i + 1}{j}'), f'a{i}{j}_2')
 
     mark_all_equal_to(f'a00_1')
@@ -155,8 +155,32 @@ def example13(scene):
     scene.wait(2)
 
 
+def generate_heart_points(n_points=1000):
+    t = np.linspace(0, 2 * np.pi, n_points)
+    x = 16 * np.sin(t) ** 3
+    y = 13 * np.cos(t) - 5 * np.cos(2 * t) - 2 * np.cos(3 * t) - np.cos(4 * t)
+
+    return x.tolist(), y.tolist()
+
+
+def example14(scene):
+    x, y = generate_heart_points(26)
+    l = [(i, j) for i, j in zip(x, y)]
+    recenter_camera(l)
+    for i in range(len(l)):
+        x, y = l[i][0], l[i][1]
+        point(chr(ord('A')+i), x=x, y=y)
+
+    for i in range(len(l)):
+        name1 = chr(ord('A')+i)
+        name2 = chr(ord('A') + (i + 1) % 26)
+        segment((name1, name2))
+
+    scene.wait(5)
+
+
 class Main(Scene):
     def construct(self):
         init(scene=self)
 
-        example12(self)
+        example14(self)

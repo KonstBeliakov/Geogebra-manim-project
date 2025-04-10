@@ -59,8 +59,8 @@ class Circle(Figure):
             fill_opacity=FIGURE_FILL_OPACITY
         )
         circle.move_to((self.center.x, self.center.y, 0))
-        self.scene.play(Create(circle))
-        self.scene.wait(0.3)
+        self.scene.play(Create(circle), run_time=circle_render_time)
+        self.scene.wait(circle_delay)
 
         # Updater function to update the circle dynamically.
         def update_circle(m: manim.Circle):
