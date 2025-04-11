@@ -78,7 +78,7 @@ def parse(ggb_file):
                         labels = [outputs.get(f"a{i}") for i in range(len(outputs.attrib))]
                         for i in range(len(points)):
                             operations.append(
-                                f"Segment(self, '{points[i]}', '{points[(i + 1) % len(points)]}', '{labels[i]}')"
+                                f"Segment(self, '{points[i]}', '{points[(i + 1) % len(points)]}', '{labels[i+1]}')"
                             )
                             used[labels[i]] = True
 

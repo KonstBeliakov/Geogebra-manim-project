@@ -36,7 +36,5 @@ for x, y in parse_xml.get_coordinates(input_file):
     xmax = max(xmax, x)
     ymax = max(ymax, y)
 
-print(xmax, ymax)
-
 with open(output_file, "w") as file:
     file.write(code)
