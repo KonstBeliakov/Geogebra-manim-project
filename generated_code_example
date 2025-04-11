@@ -16,7 +16,7 @@ class MyScene(Scene):
         height('ABC', 'AD')
         height('CAB', 'CE')
         intersect_figures('AD', 'CE', ('H'))
-        Point(self, 'H', -14.947803120349704, 5.210015656301699)
+        mirror_point(self, 'H', 'a', 'H\'')
         Point(self, 'H\'', -14.947803120349704, -1.653062883566297)
         Circle.from_three_points(self, 'A', 'E', 'H\'', 'd')
         intersect_figures('d', 'a', ('F', 'G'))
