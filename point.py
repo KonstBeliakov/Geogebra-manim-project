@@ -25,25 +25,28 @@ def get_point_or_random(scene, name: str | None) -> Point:
 
 
 def to_point(scene, point: str | Point | tuple[int | float, int | float] | list[int | float, int | float] | None):
-    if point is None:
-        return Point(scene)
-    if isinstance(point, str):
-        return get_point_or_random(scene, point)
-    if isinstance(point, Point):
-        return point
-    if isinstance(point, tuple) or isinstance(point, list):
-        if len(point) != 2:
-            raise ValueError(f"Can't create a point from {type(point)} of length {len(point)}.")
-        if not (isinstance(point[0], int) or isinstance(point[0], float)):
-            raise ValueError(f"Can't create a point from {point}, because of wrong type of the x coordinate.")
-        if not (isinstance(point[1], int) or isinstance(point[1], float)):
-            raise ValueError(f"Can't create a point from {point}, because of wrong type of the y coordinate.")
+    match point:
+        case None:
+            return Point(scene)
+        case str():
+            return get_point_or_random(scene, point)
+        case Point():
+            return point
+        case tuple() | list():
+            if len(point) != 2:
+                raise ValueError(f"Can't create a point from {type(point)} of length {len(point)}.")
+            if not (isinstance(point[0], int) or isinstance(point[0], float)):
+                raise ValueError(f"Can't create a point from {point}, because of wrong type of the x coordinate.")
+            if not (isinstance(point[1], int) or isinstance(point[1], float)):
+                raise ValueError(f"Can't create a point from {point}, because of wrong type of the y coordinate.")
 
-        for p in point_names.values():
-            if abs(p.x - point[0]) < 10 ** -6 and abs(p.y - point[1]) < 10 ** -6:
-                return p
+            for p in point_names.values():
+                if abs(p.x - point[0]) < 10 ** -6 and abs(p.y - point[1]) < 10 ** -6:
+                    return p
 
-        return Point(scene, x=point[0], y=point[1])
+            return Point(scene, x=point[0], y=point[1])
+        case default:
+            raise TypeError(f'Can\'t create a point from the argument of type {type(point)}')
 
 
 class Point:
@@ -106,15 +109,15 @@ class Point:
     def render(self):
         self.circle = Circle(radius=0.05, color=LINES_COLOR, fill_opacity=1)
         self.circle.move_to((self.x, self.y, 0))
-        self.scene.play(Create(self.circle))
-        self.scene.wait(0.3)
+        self.scene.play(Create(self.circle), run_time=point_render_time)
+        self.scene.wait(point_delay)
         self.circle.add_updater(lambda m: m.move_to((self.x, self.y, 0)))
         self.scene.add(self.circle)
 
         self.point_name_text = Text(self.name, font_size=30)
         self.point_name_text.move_to((self.x, self.y + 0.3, 0))
-        self.scene.play(Write(self.point_name_text))
-        self.scene.wait(0.3)
+        self.scene.play(Write(self.point_name_text), run_time=point_label_render_time)
+        self.scene.wait(point_delay)
         self.point_name_text.add_updater(lambda m: m.move_to((self.x, self.y + 0.3, 0)))
         self.scene.add(self.point_name_text)
 

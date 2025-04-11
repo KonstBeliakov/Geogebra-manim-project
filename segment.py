@@ -28,7 +28,7 @@ class Segment(Figure):
 
     def render(self):
         self.line = always_redraw(lambda: Line(tuple(self.p1), tuple(self.p2), color=LINES_COLOR))
-        self.scene.play(Create(self.line))
+        self.scene.play(Create(self.line), run_time=segment_render_time)
 
     def middle(self, middle_point_name=None):
         """

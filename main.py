@@ -15,9 +15,9 @@ def example0():
 def example1():
     points(('A', 0, 0), 'B', 'C')
 
-    triangle(('A','B', 'C'))
+    triangle(('A', 'B', 'C'))
 
-    median(('A', 'B', 'C'),  ('B', 'M'))
+    median(('A', 'B', 'C'), ('B', 'M'))
     bisector('ABC', 'BD')
     height('ABC', 'AH')
 
@@ -41,13 +41,13 @@ def example2():
 
 def example3():
     for i in range(1, 10):
-        point('ABCDEFGHIJ'[i], randrange(-10*i, 10*i), randrange(-10*i, 10*i))
+        point('ABCDEFGHIJ'[i], randrange(-10 * i, 10 * i), randrange(-10 * i, 10 * i))
         recenter_camera()
 
 
 def example4():
-    circle((0,0), 2, 'a')
-    circle((3,0), 3, 'b')
+    circle((0, 0), 2, 'a')
+    circle((3, 0), 3, 'b')
 
     intersect_figures('a', 'b', ('A', 'B'))
 
@@ -133,7 +133,7 @@ def example12(scene):
     point('A', 2.3, 1.4)
     tangent('c', 'A', segment_labels=('a', 'b'))
 
-    mark_equals('a', 'b')
+    mark_equals(['a', 'b'])
 
     move('A', 1.4, -2)
 
@@ -147,10 +147,75 @@ def example13(scene):
 
     for i in range(2):
         for j in range(2):
-            segment((f'A{i}{j}', f'A{i}{j+1}'), f'a{i}{j}_1')
+            segment((f'A{i}{j}', f'A{i}{j + 1}'), f'a{i}{j}_1')
             segment((f'A{i}{j}', f'A{i + 1}{j}'), f'a{i}{j}_2')
 
     mark_all_equal_to(f'a00_1')
+
+    scene.wait(2)
+
+
+def generate_heart_points(n_points=1000):
+    t = np.linspace(0, 2 * np.pi, n_points)
+    x = 16 * np.sin(t) ** 3
+    y = 13 * np.cos(t) - 5 * np.cos(2 * t) - 2 * np.cos(3 * t) - np.cos(4 * t)
+
+    return x.tolist(), y.tolist()
+
+
+def example14(scene):
+    x, y = generate_heart_points(26)
+    l = [(i, j) for i, j in zip(x, y)]
+    recenter_camera(l)
+    for i in range(len(l)):
+        x, y = l[i][0], l[i][1]
+        point(chr(ord('A')+i), x=x, y=y)
+
+    for i in range(len(l)):
+        name1 = chr(ord('A')+i)
+        name2 = chr(ord('A') + (i + 1) % 26)
+        segment((name1, name2))
+
+    scene.wait(5)
+
+
+def example15(scene):
+    """
+    Testing reflection functions (reflecting about a point)
+    """
+    point('A', 0, 0)
+
+    point('B', 2, 1)
+    mirror_point('B', 'A')
+
+    points(('C', 0.5, 0.5), ('D', 1, 0.5), ('E', 0.5, 1))
+
+    triangle('CDE', 't')
+
+    reflect_figure_about_point('t', 'A')
+
+    scene.wait(2)
+
+
+def example16(scene):
+    """
+    Testing a reflection function (reflection about a line)
+    """
+    point('F', 0, 0)
+    point('G', 4, 0)
+    segment('FG', 'line')
+
+    point('H', 2, 2)
+    reflect_point_about_line('H', 'FG', 'H\'')
+
+    points(('I', 1, 1), ('J', 2, 3), ('K', 3, 1))
+    triangle('IJK', 'triangle')
+    reflect_figure_about_line('triangle', 'FG', 'triangle_reflected')
+
+    point('L', 1.5, -1.5)
+    point('M', 2.5, -1.5)
+    segment('LM', 'seg')
+    reflect_figure_about_line('seg', 'FG', 'seg_reflected')
 
     scene.wait(2)
 
@@ -159,4 +224,4 @@ class Main(Scene):
     def construct(self):
         init(scene=self)
 
-        example12(self)
+        example16(self)

@@ -2,10 +2,10 @@ from functools import update_wrapper
 from math import *
 from random import uniform
 
-import numpy as np
 from manim import TAU
 
 import figures
+import settings
 import triangle as tr
 from circle import Circle, to_figure
 from figures import Figure
@@ -21,7 +21,7 @@ def midPoint(scene, p1: Point, p2: Point, name=None):
 
 
 _scene = None
-_scaling_coefficient = 1
+_new_position = lambda x, y: (x, y)
 
 
 def init(scene):
@@ -111,14 +111,146 @@ def triangle(pointNames: str, label=None):
     return tr.Triangle(scene=_scene, p1=pointNames[0], p2=pointNames[1], p3=pointNames[2], label=label)
 
 
-@on_scene
-def mirror_point(scene, p: str | Point, m: str | Point, name=None):
-    p = to_point(scene, p)
-    m = to_point(scene, m)
-    def get_position():
-        return 2 * m.x - p.x, 2 * m.y - p.y
+def line_coefficients(p1: Point, p2: Point) -> tuple[float, float, float]:
+    """
+    Returns the coefficients (A, B, C) of the line Ax + By + C = 0
+    passing through the points p1(x1, y1) and p2(x2, y2).
+    """
+    x1, y1 = p1.x, p1.y
+    x2, y2 = p2.x, p2.y
+    # Line equation through (x1, y1) and (x2, y2):
+    # A = (y2 - y1), B = (x1 - x2), C = x2*y1 - x1*y2
+    A = y2 - y1
+    B = x1 - x2
+    C = x2 * y1 - x1 * y2
+    return A, B, C
 
-    return Point(scene, name=name, get_position=get_position)
+
+@on_scene
+def mirror_point(
+        point: str | Point | tuple,
+        center: str | Point | tuple,
+        name: str = None
+) -> Point:
+    """
+    Creates a new point — the reflection of the point 'point'
+    with respect to the point 'center'.
+    """
+    p = to_point(_scene, point)
+    c = to_point(_scene, center)
+
+    def get_position():
+        return 2 * c.x - p.x, 2 * c.y - p.y
+
+    return Point(_scene, name=name, get_position=get_position)
+
+
+@on_scene
+def reflect_figure_about_point(
+        figure: str | Figure,
+        reflection_center: str | Point | tuple,
+        new_figure_label: str = None
+) -> Figure:
+    """
+    Reflects a given geometric figure (circle, segment, triangle)
+    with respect to the point 'reflection_center'. Returns a new figure.
+    """
+    figure = to_figure(figure)
+    center = to_point(_scene, reflection_center)
+
+    if isinstance(figure, Circle):
+        new_center = mirror_point(figure.center, center)
+        return Circle(
+            _scene,
+            center=new_center,
+            get_r=figure._get_radius,
+            label=new_figure_label
+        )
+    if isinstance(figure, Segment):
+        new_p1 = mirror_point(figure.p1, center)
+        new_p2 = mirror_point(figure.p2, center)
+        return Segment(_scene, new_p1, new_p2, label=new_figure_label)
+    if isinstance(figure, Triangle):
+        new_p1 = mirror_point(figure.p1, center)
+        new_p2 = mirror_point(figure.p2, center)
+        new_p3 = mirror_point(figure.p3, center)
+        return Triangle(
+            _scene,
+            p1=new_p1,
+            p2=new_p2,
+            p3=new_p3,
+            label=new_figure_label
+        )
+
+
+@on_scene
+def reflect_point_about_line(
+        point: str | Point | tuple,
+        reflection_line: str | Segment,
+        name: str = None
+) -> Point:
+    """
+    Reflects the point 'point' about the line defined by the segment 'reflection_line'.
+    The reflection uses the infinite line passing through the endpoints of the segment.
+    Returns a new point.
+    """
+    p = to_point(_scene, point)
+    line_segment = to_figure(reflection_line)
+
+    if not isinstance(line_segment, Segment):
+        raise TypeError(f"The argument reflection_line must be a Segment, not {type(line_segment)}.")
+
+    A, B, C = line_coefficients(line_segment.p1, line_segment.p2)
+
+    def get_position():
+        x0, y0 = p.x, p.y
+        denom = A * A + B * B
+        # Formula for reflection of a point (x0, y0) about the line A x + B y + C = 0:
+        # x' = x0 - 2A(A*x0 + B*y0 + C)/(A^2 + B^2)
+        # y' = y0 - 2B(A*x0 + B*y0 + C)/(A^2 + B^2)
+        factor = 2 * (A * x0 + B * y0 + C) / denom
+        xr = x0 - factor * A
+        yr = y0 - factor * B
+        return xr, yr
+
+    return Point(_scene, name=name, get_position=get_position)
+
+
+@on_scene
+def reflect_figure_about_line(
+        figure: Figure | str,
+        reflection_line: str | Segment,
+        new_figure_label: str = None
+) -> Figure:
+    """
+    Reflects the given figure about the infinite line
+    passing through the endpoints of the segment 'reflection_line'.
+    Returns a new figure.
+    """
+    figure = to_figure(figure)
+    line_segment = to_figure(reflection_line)
+
+    if not isinstance(line_segment, Segment):
+        raise TypeError(f"The argument reflection_line must be a Segment, not {type(line_segment)}.")
+
+    if isinstance(figure, Circle):
+        new_center = reflect_point_about_line(figure.center, line_segment)
+        return Circle(_scene, center=new_center, get_r=figure._get_radius, label=new_figure_label)
+    if isinstance(figure, Segment):
+        new_p1 = reflect_point_about_line(figure.p1, line_segment)
+        new_p2 = reflect_point_about_line(figure.p2, line_segment)
+        return Segment(_scene, new_p1, new_p2, label=new_figure_label)
+    if isinstance(figure, Triangle):
+        new_p1 = reflect_point_about_line(figure.p1, line_segment)
+        new_p2 = reflect_point_about_line(figure.p2, line_segment)
+        new_p3 = reflect_point_about_line(figure.p3, line_segment)
+        return Triangle(
+            _scene,
+            p1=new_p1,
+            p2=new_p2,
+            p3=new_p3,
+            label=new_figure_label
+        )
 
 
 @on_scene
@@ -134,8 +266,8 @@ def segment(pointNames: str, label=None):
 @on_scene
 def point(name: str, x=None, y=None):
     return Point(_scene, name,
-                 None if x is None else x / _scaling_coefficient,
-                 None if y is None else y / _scaling_coefficient)
+                 None if x is None else _new_position(x, y)[0],
+                 None if y is None else _new_position(x, y)[1])
 
 
 @on_scene
@@ -173,8 +305,9 @@ def _circle_intersection(circle1, circle2, pointNames: tuple[str, str] = (None, 
 
 @on_scene
 def _segment_circle_intersections(segment: Segment, circle: Circle, pointNames: tuple[str, str] = (None, None)):
-    return [Point(_scene, pointNames[0], get_position=lambda: segment_circle_intersection_positions(segment, circle)[0]),
-            Point(_scene, pointNames[1], get_position=lambda: segment_circle_intersection_positions(segment, circle)[1])]
+    return [
+        Point(_scene, pointNames[0], get_position=lambda: segment_circle_intersection_positions(segment, circle)[0]),
+        Point(_scene, pointNames[1], get_position=lambda: segment_circle_intersection_positions(segment, circle)[1])]
 
 
 @on_scene
@@ -300,45 +433,67 @@ def move_points(points, positions, run_time=2):
 
 
 @on_scene
-def recenter_camera(run_time=2):
-    global _scaling_coefficient
+def recenter_camera(point_cords=None, run_time=2):
+    global _new_position
 
     points = point_names.values()
-    point_cords = [(p.x, p.y) for p in points if p.active]
 
-    for figure in figures.figure_names.values():
-        if isinstance(figure, Circle):
-            x, y, r = figure.center.x, figure.center.y, figure.r
-            point_cords.append((x + r, y))
-            point_cords.append((x - r, y))
-            point_cords.append((x, y - r))
-            point_cords.append((x, y + r))
+    if point_cords is None:
+        point_cords = [(p.x, p.y) for p in points if p.active]
 
-    min_x = min(p[0] for p in point_cords)
-    max_x = max(p[0] for p in point_cords)
-    min_y = min(p[1] for p in point_cords)
-    max_y = max(p[1] for p in point_cords)
+    if settings.recenter_with_circles:
+        for figure in figures.figure_names.values():
+            if isinstance(figure, Circle):
+                x, y, r = figure.center.x, figure.center.y, figure.r
+                point_cords.append((x + r, y))
+                point_cords.append((x - r, y))
+                point_cords.append((x, y - r))
+                point_cords.append((x, y + r))
 
-    print(min_x, max_x, min_y, max_y)
+    #min_x = min(p[0] for p in point_cords)
+    #max_x = max(p[0] for p in point_cords)
+    #min_y = min(p[1] for p in point_cords)
+    #max_y = max(p[1] for p in point_cords)
 
-    screen_scale = 0.9  # size of the screen without borders (border size is 0.1 of the screen)
+    #screen_scale = 0.9  # size of the screen without borders (border size is 0.1 of the screen)
 
-    width = (max_x - min_x) / screen_scale
-    height = (max_y - min_y) / screen_scale
+    #width = (max_x - min_x) / screen_scale
+    #height = (max_y - min_y) / screen_scale
 
-    scale_x = _scene.camera.frame_width / width
-    scale_y = _scene.camera.frame_height / height
+    #center = (
+    #    min_x + width / 2,
+    #    min_y + height / 2
+    #)
+
+    center = (
+        sum([p[0] for p in point_cords]) / len(point_cords),
+        sum([p[1] for p in point_cords]) / len(point_cords)
+    )
+
+    #scale_x = _scene.camera.frame_width / width
+    #scale_y = _scene.camera.frame_height / height
+
+    dx = max([abs(p[0] - center[0]) for p in point_cords])
+    dy = max([abs(p[1] - center[1]) for p in point_cords])
+
+    dx_new = _scene.camera.frame_width / 2
+    dy_new = _scene.camera.frame_height / 2
+
+    scale_x = dx_new / dx
+    scale_y = dy_new / dy
+
     scale_factor = min(scale_x, scale_y)
-
-    _scaling_coefficient *= scale_factor
 
     def new_position(x, y):
         return (
-            (x - min_x) * scale_factor - 0.5 * _scene.camera.frame_width * screen_scale,
-            (y - min_y) * scale_factor - 0.5 * _scene.camera.frame_height * screen_scale
+            (x - center[0]) * scale_factor,
+            (y - center[1]) * scale_factor
         )
 
-    move_points(points, [new_position(point.x, point.y) for point in points], run_time=run_time)
+    _new_position = new_position
+
+    if points:
+        move_points(points, [new_position(point.x, point.y) for point in points], run_time=run_time)
 
 
 @on_scene
