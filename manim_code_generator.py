@@ -29,5 +29,12 @@ operations = parse_xml.parse(input_file)
 
 code = generate_manim_code(operations)
 
+xmax = -100
+ymax = -100
+
+for x, y in parse_xml.get_coordinates(input_file):
+    xmax = max(xmax, x)
+    ymax = max(ymax, y)
+
 with open(output_file, "w") as file:
     file.write(code)
