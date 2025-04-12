@@ -220,8 +220,24 @@ def example16(scene):
     scene.wait(2)
 
 
+def example17(scene):
+    triangle('ABC', 't')
+
+    bisector('ABC', 'BX')
+
+    mark_equal_angles(['ABX', 'XBC'])
+
+    move_randomly('A')
+    scene.wait(1)
+    move_randomly('B')
+    scene.wait(1)
+    move_randomly('C')
+
+    scene.wait(3)
+
+
 class Main(Scene):
     def construct(self):
         init(scene=self)
 
-        example16(self)
+        example17(self)

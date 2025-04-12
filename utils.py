@@ -13,6 +13,7 @@ from math_utils import *
 from point import Point, get_point_by_name, point_names, to_point
 from segment import Segment
 from tick import Tick
+from arcmark import ArcMark
 from triangle import Triangle
 
 
@@ -509,3 +510,11 @@ def mark_all_equal_to(segment: str | Segment):
     for figure in figures.figure_names.values():
         if isinstance(figure, Segment) and abs(segment.length - figure.length) < 1e-12:
             Tick(_scene, segment=figure, base_segment=segment)
+
+
+@on_scene
+def mark_equal_angles(angles: list[list[str | Point]]):
+    for angle in angles:
+        if len(angle) != 3:
+            raise ValueError(f'The angle should consist from 3 points, not {len(angle)}.')
+        ArcMark(_scene, *angle)
