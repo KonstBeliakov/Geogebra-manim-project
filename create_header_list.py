@@ -19,7 +19,7 @@ def get_type_name(annotation):
     return "Any"
 
 
-def extract_function_headers_and_docs(input_file, output_file):
+def extract_function_headers_and_docs(input_file='utils.py'):
     with open(input_file, 'r') as f:
         code = f.read()
 
@@ -43,11 +43,7 @@ def extract_function_headers_and_docs(input_file, output_file):
 
             function_details.append(f"{func_name}({args_str})\n'''{docstring}'''\n")
 
-    with open(output_file, 'w') as f:
-        f.write("\n".join(function_details))
+    #with open(output_file, 'w') as f:
+    #    f.write("\n".join(function_details))
 
-
-input_file = 'utils.py'
-output_file = 'header_list.py'
-
-extract_function_headers_and_docs(input_file, output_file)
+    return "\n".join(function_details)
