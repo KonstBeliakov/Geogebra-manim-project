@@ -5,9 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="2ba5b3d9-37d9-4032-8689-face39559deb" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/generated_code_example.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/manim_code_generator.py" beforeDir="false" afterPath="$PROJECT_DIR$/manim_code_generator.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test.ggb" beforeDir="false" afterPath="$PROJECT_DIR$/test.ggb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -185,7 +183,8 @@
       <workItem from="1743766948010" duration="17098000" />
       <workItem from="1744031892217" duration="2517000" />
       <workItem from="1744220473896" duration="2700000" />
-      <workItem from="1744360889553" duration="102000" />
+      <workItem from="1744360889553" duration="2381000" />
+      <workItem from="1746180253431" duration="775000" />
     </task>
     <servers />
   </component>
@@ -193,7 +192,7 @@
     <option name="version" value="3" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/Geogebra_manim_project$manim_code_generator.coverage" NAME="manim_code_generator Coverage Results" MODIFIED="1744225020636" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/Geogebra_manim_project$manim_code_generator.coverage" NAME="manim_code_generator Coverage Results" MODIFIED="1746180721296" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/Geogebra_manim_project$parse_xml.coverage" NAME="parse_xml Coverage Results" MODIFIED="1743782048826" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/Geogebra_manim_project$generated_code_example.coverage" NAME="generated_code_example Coverage Results" MODIFIED="1744221219321" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
