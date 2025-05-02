@@ -1,3 +1,43 @@
+# GeoGebra-Manim Project Setup & Run Instructions
+
+1. **Clone the repository**  
+   ```bash
+   git clone https://github.com/KonstBeliakov/Geogebra-manim-project.git
+   cd Geogebra-manim-project
+   ```
+
+2. **Create & activate a virtual environment**  
+   - **Unix / macOS**  
+     ```bash
+     python3 -m venv venv
+     source venv/bin/activate
+     ```
+   - **Windows (PowerShell)**  
+     ```powershell
+     python -m venv venv
+     .\venv\Scripts\Activate.ps1
+     ```
+
+4. **Install dependencies**  
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+5. **Run the code generator**  
+   ```bash
+   python manim_code_generator.py path/to/input.ggb -o path/to/your/generated_code.py
+   ```
+
+6. **Render your Manim scene**  
+   ```bash
+   manim -pql generated_scene.py MyScene
+   ```
+
+---
+
+
+
+
 # Geometry in manim
 Implementation of the main Geogebra methods in the python manim library
 ### Triangles

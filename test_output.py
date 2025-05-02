@@ -24,5 +24,4 @@ class MyScene(Scene):
         Segment(self, 'D', 'H\'', 'i')
         Segment(self, 'F', 'C', 'j')
         Segment(self, 'C', 'G', 'k')
-
         self.wait(1)
