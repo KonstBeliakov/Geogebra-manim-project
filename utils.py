@@ -84,7 +84,20 @@ def prepare_segment(scene, triangle: str, segment_name: str, point_builder):
 
 
 @on_scene
-def median(triangle: str, segment_name: str):
+def median(triangle: str, segment_name: str) -> Point:
+    """
+    Draw the **median** from a vertex of *triangle*.
+
+    :param triangle : str
+            The three-character label of the triangle, e.g. ``'ABC'``.
+    :param segment_name : str
+            A two-character string such as ``'AD'`` where the first character is
+            the vertex of the median and the second is the new point to be
+            created on the opposite side.
+
+    :returns: Point The midpoint of the opposite side, i.e. the foot of the median.
+    """
+
     def midpoint_builder(scene, p1, A, B, name):
         return midPoint(scene, A, B, name=name)
 
@@ -93,6 +106,14 @@ def median(triangle: str, segment_name: str):
 
 @on_scene
 def bisector(triangle: str, segment_name: str):
+    """
+    Draw an **internal angle-bisector** from a vertex of *triangle*.
+
+    The interface is the same as median; the created point lies on
+    the opposite side at such a position that the two adjacent angles are
+    equal.
+    """
+
     def bisector_builder(scene, p1, A, B, name):
         return Point(scene, name=name, get_position=lambda: get_bisector_position(p1, A, B))
 
@@ -101,6 +122,14 @@ def bisector(triangle: str, segment_name: str):
 
 @on_scene
 def height(triangle: str, segment_name: str):
+    """
+    Draw an **altitude (height)** from a vertex of *triangle*.
+
+    The altitude is dropped perpendicularly on the opposite side (or its
+    extension).  The second character of *segment_name* names the foot of the
+    perpendicular.
+    """
+
     def altitude_builder(scene, p1, A, B, name):
         return Point(scene, name=name, get_position=lambda: get_altitude_position(p1, A, B))
 
@@ -109,6 +138,13 @@ def height(triangle: str, segment_name: str):
 
 @on_scene
 def triangle(pointNames: str, label=None):
+    """
+    Convenience wrapper around :class:`triangle.Triangle`.
+
+    :param pointNames : str Exactly three characters (e.g. ``'ABC'``).
+    :param label : str | None - Optional label for the triangle itself.
+    :returns Triangle
+    """
     return tr.Triangle(scene=_scene, p1=pointNames[0], p2=pointNames[1], p3=pointNames[2], label=label)
 
 
@@ -255,17 +291,36 @@ def reflect_figure_about_line(
 
 
 @on_scene
-def circle(center=None, r=1, label=None):
+def circle(center: Point | str | tuple[int | float] = None,
+           r: float = 1,
+           label: str = None):
+    """
+    Draw a circle
+    :param center - center of the circle
+    :param r - radius of the circle
+    :label - optional label of the circle
+    """
     return Circle(_scene, center=center, r=r, label=label)
 
 
 @on_scene
-def segment(pointNames: str, label=None):
+def segment(pointNames: str | tuple[str, str], label=None):
+    """
+    Draw a segment
+    :param pointNames - names of endpoint of the segment. For example ``'AB'`` or ``('A1','B1')``
+    :param label - optional label of the segment
+    """
     return Segment(_scene, pointNames[0], pointNames[1], label=label)
 
 
 @on_scene
 def point(name: str, x=None, y=None):
+    """
+    Draw a point
+    :param name - name of the point
+    :param x - x position of the point
+    :param y - y position of the point
+    """
     return Point(_scene, name,
                  None if x is None else _new_position(x, y)[0],
                  None if y is None else _new_position(x, y)[1])
@@ -273,6 +328,11 @@ def point(name: str, x=None, y=None):
 
 @on_scene
 def points(*points_data):
+    """
+    Function for creation of multiple points
+    :param points_data – strings of names or tuples (name, x, y)
+    :return list[Point] – list of created points
+    """
     points = []
     for point_data in points_data:
         if isinstance(point_data, str):
@@ -313,6 +373,12 @@ def _segment_circle_intersections(segment: Segment, circle: Circle, pointNames: 
 
 @on_scene
 def intersect_figures(f1: str | Figure, f2: str | Figure, pointNames: tuple[str, str] = (None, None)):
+    """
+    Function for intersecting two figures (Circles or Segments)
+    :param f1 - first figure or its label
+    :param f2 - second figure or its label
+    :param pointNames - names of intersection points
+    """
     f1 = to_figure(f1)
     f2 = to_figure(f2)
 
@@ -329,6 +395,13 @@ def intersect_figures(f1: str | Figure, f2: str | Figure, pointNames: tuple[str,
 
 @on_scene
 def circumscribed_circle(triangle: str | Triangle, circle_label=None, center_name=None):
+    """
+    Draw a circumcircle of a triangle
+    :param triangle – Triangle object or its label
+    :param circle_label – label for the circle
+    :param center_name – name for the center point of a circle
+    :return Circle – the circumscribed circle
+    """
     triangle = to_figure(triangle)
 
     return triangle.circumscribed_circle(circle_label=circle_label, point_name=center_name)
@@ -339,6 +412,14 @@ def triangle_center(p1: str | Point | tuple[int | float, int | float],
                     p2: str | Point | tuple[int | float, int | float],
                     p3: str | Point | tuple[int | float, int | float],
                     pointName: str = None):
+    """
+    Draw a circum-centre of three points
+    :param p1 – first vertex (Point or its name)
+    :param p2 – second vertex (Point or its name)
+    :param p3 – third vertex (Point or its name)
+    :param pointName – name for the center point
+    :return Point – the circumcenter
+    """
     p1 = to_point(_scene, p1)
     p2 = to_point(_scene, p2)
     p3 = to_point(_scene, p3)
@@ -351,12 +432,24 @@ def move(point: str | Point | tuple[int | float, int | float],
          x: float,
          y: float,
          run_time=2):
+    """
+    Animate point to absolute coordinates
+    :param point – the point or its name
+    :param x – new X coordinate
+    :param y – new Y coordinate
+    :param run_time – duration of the animation
+    """
     to_point(_scene, point).move(x, y, run_time=run_time)
 
 
 @on_scene
 def move_randomly(point: str | Point | tuple[int | float, int | float],
                   run_time=2):
+    """
+    Move point to a random position
+    :param point – the point or its name
+    :param run_time – duration of the movement
+    """
     move(point, uniform(-3, 3), uniform(-3, 3), run_time=run_time)
 
 
@@ -364,6 +457,12 @@ def move_randomly(point: str | Point | tuple[int | float, int | float],
 def move_along_circle(point: str | Point | tuple[int | float, int | float],
                       circle: str | Circle,
                       run_time=4):
+    """
+    Move point along the full circle
+    :param point – the point or its name
+    :param circle – the circle or its label
+    :param run_time – time for one full animation
+    """
     p = to_point(_scene, point)
     circle = to_figure(circle)
     p.move_along_circle(circle,
@@ -376,6 +475,14 @@ def tangent(circle: Circle | str,
             point: str | Point | tuple[int | float, int | float],
             pointNames: tuple[str, str] = (None, None),
             segment_labels: tuple[str, str] = (None, None)):
+    """
+    Tangents from an external point to a circle
+    :param circle – the circle or its label
+    :param point – the external point or its name
+    :param pointNames – names for the points of tangency
+    :param segment_labels – labels for the tangent segments
+    :return list[Point] – the two points of tangency
+    """
     circle = to_figure(circle)
     point = to_point(_scene, point)
 
@@ -393,6 +500,14 @@ def arc_midpoint(p1: str | Point | tuple[int | float, int | float],
                  p2: str | Point | tuple[int | float, int | float],
                  circle: Circle | str,
                  pointName: str = None):
+    """
+    Drawing a midpoint of the arc
+    :param p1 – first point on the circle or its name
+    :param p2 – second point on the circle or its name
+    :param circle – the circle or its label
+    :param pointName – name for the new midpoint
+    :return Point – midpoint of the arc
+    """
     p1 = to_point(_scene, p1)
     p2 = to_point(_scene, p2)
     circle = to_figure(circle)
@@ -404,6 +519,13 @@ def arc_midpoint(p1: str | Point | tuple[int | float, int | float],
 def inscribed_circle(triangle: str | Triangle,
                      pointName: str = None,
                      circle_label: str = None):
+    """
+    Creating a new circle - incircle of a triangle
+    :param triangle – the triangle or its label
+    :param pointName – name for the incenter
+    :param circle_label – label for the circle
+    :return Circle – the inscribed circle
+    """
     triangle = to_figure(triangle)
 
     center = Point(_scene, name=pointName,
@@ -414,7 +536,15 @@ def inscribed_circle(triangle: str | Triangle,
 
 
 @on_scene
-def point_on_circle(circle, pointName=None):
+def point_on_circle(circle: str | Circle, pointName=None):
+    """
+    Random point on a circle
+    :param circle – the circle or its label
+    :param pointName – name for the new point
+    :return Point – the random point on the circle
+    """
+    circle = to_figure(circle)
+
     cx, cy = circle.center.x, circle.center.y
 
     angle = uniform(0, TAU)
@@ -426,6 +556,12 @@ def point_on_circle(circle, pointName=None):
 
 @on_scene
 def move_points(points, positions, run_time=2):
+    """
+    Animate multiple points to new positions
+    :param points – list of points
+    :param positions – list of coordinates (x, y)
+    :param run_time – duration of the animation
+    """
     _scene.play(
         *[point.x_tracker.animate.set_value(new_x) for point, (new_x, _) in zip(points, positions)],
         *[point.y_tracker.animate.set_value(new_y) for point, (_, new_y) in zip(points, positions)],
@@ -435,6 +571,11 @@ def move_points(points, positions, run_time=2):
 
 @on_scene
 def recenter_camera(point_cords=None, run_time=2):
+    """
+    Auto-fit all points into view
+    :param point_cords – list of coordinates or None
+    :param run_time – duration of the zoom animation
+    """
     global _new_position
 
     points = point_names.values()
@@ -451,28 +592,28 @@ def recenter_camera(point_cords=None, run_time=2):
                 point_cords.append((x, y - r))
                 point_cords.append((x, y + r))
 
-    #min_x = min(p[0] for p in point_cords)
-    #max_x = max(p[0] for p in point_cords)
-    #min_y = min(p[1] for p in point_cords)
-    #max_y = max(p[1] for p in point_cords)
+    # min_x = min(p[0] for p in point_cords)
+    # max_x = max(p[0] for p in point_cords)
+    # min_y = min(p[1] for p in point_cords)
+    # max_y = max(p[1] for p in point_cords)
 
-    #screen_scale = 0.9  # size of the screen without borders (border size is 0.1 of the screen)
+    # screen_scale = 0.9  # size of the screen without borders (border size is 0.1 of the screen)
 
-    #width = (max_x - min_x) / screen_scale
-    #height = (max_y - min_y) / screen_scale
+    # width = (max_x - min_x) / screen_scale
+    # height = (max_y - min_y) / screen_scale
 
-    #center = (
+    # center = (
     #    min_x + width / 2,
     #    min_y + height / 2
-    #)
+    # )
 
     center = (
         sum([p[0] for p in point_cords]) / len(point_cords),
         sum([p[1] for p in point_cords]) / len(point_cords)
     )
 
-    #scale_x = _scene.camera.frame_width / width
-    #scale_y = _scene.camera.frame_height / height
+    # scale_x = _scene.camera.frame_width / width
+    # scale_y = _scene.camera.frame_height / height
 
     dx = max([abs(p[0] - center[0]) for p in point_cords])
     dy = max([abs(p[1] - center[1]) for p in point_cords])
@@ -499,12 +640,20 @@ def recenter_camera(point_cords=None, run_time=2):
 
 @on_scene
 def mark_equals(segments: list[str | Segment]):
+    """
+    Mark given segments as equal with a single tick
+    :param segments – list of segments or their labels
+    """
     for segment in segments:
         Tick(_scene, segment, segments[0])
 
 
 @on_scene
 def mark_all_equal_to(segment: str | Segment):
+    """
+    Tick every segment equal in length to the given one
+    :param segment – the base segment or its label
+    """
     segment = to_figure(segment)
 
     for figure in figures.figure_names.values():
@@ -514,6 +663,10 @@ def mark_all_equal_to(segment: str | Segment):
 
 @on_scene
 def mark_equal_angles(angles: list[list[str | Point]]):
+    """
+    Mark several angles as equal
+    :param angles – list of triplets of points [A, O, B]
+    """
     for angle in angles:
         if len(angle) != 3:
             raise ValueError(f'The angle should consist from 3 points, not {len(angle)}.')
