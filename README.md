@@ -33,6 +33,11 @@
    manim -pql generated_scene.py MyScene
    ```
 
+### How to automatically create animated solutions for problems using this project?
+1. Put file `open_ai_key` with your chatGpt API key in the folder of cloned repository.
+2. Run file `gpt_solving_problems.py`.
+3. Open directory `generation_attempt`. There will be a file `prompt.md` with prompt to gpt and file `solution.py` with generated manim code.
+4. Run file `solution.py` to create and open the animation.
 ---
 
 
