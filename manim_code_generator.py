@@ -1,5 +1,5 @@
+import argparse
 import parse_xml
-
 
 def generate_manim_code(operations):
     code_lines = []
@@ -16,25 +16,31 @@ class MyScene(Scene):
     def construct(self):
         init(self)
         recenter_camera()
-{''.join([f'        {line}{nl}' for line in code_lines])}
-        self.wait(1)
+{''.join([f'        {line}{nl}' for line in code_lines])}        self.wait(1)
 """
     return scene_code
 
-input_file = "usamo2025.ggb"
-output_file = "generated_code_example"
 
 
-operations = parse_xml.parse(input_file)
+parser = argparse.ArgumentParser(
+    description="Generate a Manim scene script from a GeoGebra file"
+)
+parser.add_argument(
+    'input_file',
+    help='Path to the .ggb file'
+)
+parser.add_argument(
+    '-o', '--output',
+    default='generated_code_example.py',
+    help='Path for the generated Python output file'
+)
+args = parser.parse_args()
+
+operations = parse_xml.parse(args.input_file)
 
 code = generate_manim_code(operations)
 
-xmax = -100
-ymax = -100
-
-for x, y in parse_xml.get_coordinates(input_file):
-    xmax = max(xmax, x)
-    ymax = max(ymax, y)
-
-with open(output_file, "w") as file:
+with open(args.output, 'w') as file:
     file.write(code)
+
+print(f"Generated Manim code saved to '{args.output}'.")
