@@ -5,6 +5,8 @@ FIGURE_FILL_OPACITY = 0.1
 
 tick_length = 0.2
 
+arc_radius = 0.4
+
 recenter_with_circles = True
 
 point_delay = 0.1
