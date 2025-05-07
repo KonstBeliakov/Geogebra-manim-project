@@ -44,7 +44,7 @@ def parse(ggb_file):
                     if element_type == 'point':
                         coords = element.find("coords")
                         x, y, z = float(coords.get("x")), float(coords.get("y")), float(coords.get("z"))
-                        operations.append(f"Point(self, '{label}', {x}, {y})")
+                        operations.append(f"point('{label}', {x}, {y})")
                     elif element_type == 'vector':
                         coords = element.find("coords")
                         x, y, z = float(coords.get("x")), float(coords.get("y")), float(coords.get("z"))
@@ -65,20 +65,20 @@ def parse(ggb_file):
                         a, b = inputs.get('a0'), inputs.get('a1')
                         label = outputs.get('a0')
                         used[label] = True
-                        operations.append(f"Segment(self, '{a}', '{b}', '{label}')")
+                        operations.append(f"segment('{a}', '{b}', '{label}')")
 
                     elif command_name == 'Midpoint':
                         a, b = inputs.get('a0'), inputs.get('a1')
                         label = outputs.get('a0')
                         used[label] = True
-                        operations.append(f"midPoint(self, '{a}', '{b}', '{label}')")
+                        operations.append(f"midPoint('{a}', '{b}', '{label}')")
 
                     elif command_name == 'Polygon':
                         points = [inputs.get(f"a{i}") for i in range(len(inputs.attrib))]
                         labels = [outputs.get(f"a{i}") for i in range(len(outputs.attrib))]
                         for i in range(len(points)):
                             operations.append(
-                                f"Segment(self, '{points[i]}', '{points[(i + 1) % len(points)]}', '{labels[i+1]}')"
+                                f"segment('{points[i]}', '{points[(i + 1) % len(points)]}', '{labels[i+1]}')"
                             )
                             used[labels[i]] = True
 
@@ -96,10 +96,10 @@ def parse(ggb_file):
                         used[label] = True
                         try:
                             radius = float(radius_or_point)
-                            operations.append(f"Circle(self, '{center}', {radius}, '{label}')")
+                            operations.append(f"circle('{center}', {radius}, '{label}')")
                         except ValueError:
                             p = inputs.get("a2")
-                            operations.append(f"Circle.from_three_points(self, '{center}', '{radius_or_point}', '{p}', '{label}')")
+                            operations.append(f"circle_from_three_points('{center}', '{radius_or_point}', '{p}', '{label}')")
 
                     elif command_name == "Alt":
                         a, b, c = inputs.get('a0'), inputs.get('a1'), inputs.get('a2')
@@ -128,13 +128,14 @@ def parse(ggb_file):
                     elif command_name == "Mirror":
                         a, b = inputs.get('a0'), inputs.get('a1')
                         label = outputs.get('a0')
-                        operations.append(f"mirror_point(self, '{a}', '{b}', '{label}')")
+                        used[label] = True
+                        operations.append(f"reflect_point_about_line('{a}', '{b}', '{label}')")
                     # todo
                     elif command_name == 'Line':
                         a, b = inputs.get('a0'), inputs.get('a1')
                         label = outputs.get('a0')
                         used[label] = True
-                        operations.append(f"Line(self, '{a}', '{b}', '{label}')")
+                        operations.append(f"Line('{a}', '{b}', '{label}')")
 
                     elif command_name == 'Ray':
                         a, b = inputs.get('a0'), inputs.get('a1')

@@ -6,7 +6,7 @@ from manim import TAU
 
 import figures
 import settings
-import triangle as tr
+import triangle as trf
 from circle import Circle, to_figure
 from figures import Figure
 from math_utils import *
@@ -17,8 +17,8 @@ from arcmark import ArcMark
 from triangle import Triangle
 
 
-def midPoint(scene, p1: Point, p2: Point, name=None):
-    return Point(scene, get_position=lambda: ((p1.x + p2.x) / 2, (p1.y + p2.y) / 2), name=name)
+def midPoint(p1: Point, p2: Point, name=None):
+    return Point(_scene, get_position=lambda: ((p1.x + p2.x) / 2, (p1.y + p2.y) / 2), name=name)
 
 
 _scene = None
@@ -301,17 +301,33 @@ def circle(center: Point | str | tuple[int | float] = None,
     :label - optional label of the circle
     """
     return Circle(_scene, center=center, r=r, label=label)
+@on_scene
+def circle(center: Point | str | tuple[int | float] = None,
+           r: float = 1,
+           label: str = None):
+    """
+    Draw a circle
+    :param center - center of the circle
+    :param r - radius of the circle
+    :label - optional label of the circle
+    """
+    return Circle(_scene, center=center, r=r, label=label)
+
+@on_scene
+def circle_from_three_points(p1: str | Point | tuple[float, float],
+                          p2: str | Point | tuple[float, float],
+                          p3: str | Point | tuple[float, float],
+                          label: str = None,
+                          center_name: str = None):
+    return Circle.from_three_points(_scene, p1, p2, p3, label, center_name)
+
 
 
 @on_scene
-def segment(pointNames: str | tuple[str, str], label=None):
-    """
-    Draw a segment
-    :param pointNames - names of endpoint of the segment. For example ``'AB'`` or ``('A1','B1')``
-    :param label - optional label of the segment
-    """
-    return Segment(_scene, pointNames[0], pointNames[1], label=label)
-
+def segment(p1: str | Point | tuple[float, float] = None,
+             p2: str | Point | tuple[float, float] = None,
+             label: str = None):
+    return Segment(_scene, p1, p2, label)
 
 @on_scene
 def point(name: str, x=None, y=None):
@@ -340,7 +356,6 @@ def points(*points_data):
         else:
             points.append(point(*point_data))
     return points
-
 
 @on_scene
 def _intersect_segments(segment1: str, segment2: str, point_name=None):

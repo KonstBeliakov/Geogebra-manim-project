@@ -1,7 +1,7 @@
 import argparse
 import parse_xml
 
-def generate_manim_code(operations):
+def generate_manim_code(operations, CORDS):
     code_lines = []
     for op in operations:
         op_clean = ' '.join(op.split())
@@ -15,7 +15,7 @@ from utils import *
 class MyScene(Scene):
     def construct(self):
         init(self)
-        recenter_camera()
+        recenter_camera({CORDS})
 {''.join([f'        {line}{nl}' for line in code_lines])}        self.wait(1)
 """
     return scene_code
@@ -38,7 +38,9 @@ args = parser.parse_args()
 
 operations = parse_xml.parse(args.input_file)
 
-code = generate_manim_code(operations)
+cords = parse_xml.get_coordinates(args.input_file)
+
+code = generate_manim_code(operations, cords)
 
 with open(args.output, 'w') as file:
     file.write(code)
