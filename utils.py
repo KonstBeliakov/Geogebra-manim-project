@@ -686,3 +686,4 @@ def mark_equal_angles(angles: list[list[str | Point]]):
         if len(angle) != 3:
             raise ValueError(f'The angle should consist from 3 points, not {len(angle)}.')
         ArcMark(_scene, *angle)
+

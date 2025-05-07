@@ -24,6 +24,7 @@ def get_coordinates(ggb_file):
 
             return coordinates
 
+
 def parse(ggb_file):
     with zipfile.ZipFile(ggb_file, 'r') as z:
         with z.open('geogebra.xml') as xml_file:
@@ -78,7 +79,7 @@ def parse(ggb_file):
                         labels = [outputs.get(f"a{i}") for i in range(len(outputs.attrib))]
                         for i in range(len(points)):
                             operations.append(
-                                f"segment('{points[i]}', '{points[(i + 1) % len(points)]}', '{labels[i+1]}')"
+                                f"segment('{points[i]}', '{points[(i + 1) % len(points)]}', '{labels[i + 1]}')"
                             )
                             used[labels[i]] = True
 
@@ -99,7 +100,8 @@ def parse(ggb_file):
                             operations.append(f"circle('{center}', {radius}, '{label}')")
                         except ValueError:
                             p = inputs.get("a2")
-                            operations.append(f"circle_from_three_points('{center}', '{radius_or_point}', '{p}', '{label}')")
+                            operations.append(
+                                f"circle_from_three_points('{center}', '{radius_or_point}', '{p}', '{label}')")
 
                     elif command_name == "Alt":
                         a, b, c = inputs.get('a0'), inputs.get('a1'), inputs.get('a2')
@@ -116,7 +118,7 @@ def parse(ggb_file):
                     elif command_name == "TriangleCenter":
                         a, b, c, center_type = inputs.get('a0'), inputs.get('a1'), inputs.get('a2'), inputs.get('a3')
                         label = outputs.get('a0')
-                        if center_type != "4": #todo
+                        if center_type != "4":  # todo
                             continue
                         used[label] = True
                         abc = [a, b, c]
@@ -185,5 +187,4 @@ def parse(ggb_file):
                         used[label] = True
                         operations.append(f"Parabola(self, '{focus}', '{directrix}', '{label}')")
 
-
-    return operations
+    return operations, list(used.keys())

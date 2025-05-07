@@ -3,8 +3,12 @@ from random import choice, uniform
 from settings import *
 
 valid_point_names = [chr(i) for i in range(ord('A'), ord('Z') + 1)]
+user_point_names = []
 point_names = {}
 
+def mark_used_labels_for_points(labels):
+    global user_point_names
+    user_point_names = labels
 
 def get_point_by_name(name: str) -> Point:
     if name not in point_names:
@@ -73,7 +77,11 @@ class Point:
         self.y_tracker = ValueTracker(y)
 
         if name is None:
-            name = choice(valid_point_names)
+            for l in valid_point_names:
+                if l not in user_point_names:
+                    name = l
+            if name is None:
+                name = choice(valid_point_names)
         if name in point_names:
             raise ValueError(f"The name {name} is already in use")
         self.name = name

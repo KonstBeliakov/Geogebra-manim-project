@@ -4,14 +4,25 @@ from abc import ABC, abstractmethod
 from point import point_names
 
 valid_figure_labels = [chr(i) for i in range(ord('a'), ord('z') + 1)]
+user_figure_labels = []
 figure_names = {}
+
+
+def mark_used_labels_for_figures(labels):
+    global user_figure_labels
+    user_figure_labels = labels
 
 
 class Figure(ABC):
     def __init__(self, scene, label=None):
         if label is None:
-            label = choice(valid_figure_labels)
+            for l in valid_figure_labels:
+                if l not in user_figure_labels:
+                    label = l
+            if label is None:
+                label = choice(valid_figure_labels)
         if label in figure_names:
+            print("DEBUG: ", user_figure_labels)
             raise ValueError(f"The name {label} is already in use")
         self.label = label
         figure_names[label] = self
