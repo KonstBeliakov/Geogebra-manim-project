@@ -17,3 +17,6 @@ segment_render_time = 0.3
 
 circle_delay = 0.1
 circle_render_time = 1
+
+default_label_offset_x = 0
+default_label_offset_y = 0.3

@@ -203,14 +203,14 @@ def example16(scene):
     """
     point('F', 0, 0)
     point('G', 4, 0)
-    segment('FG', 'line')
+    segment('F', 'G', label='line')
 
     point('H', 2, 2)
-    reflect_point_about_line('H', 'FG', 'H\'')
+    reflect_point_about_line('H', 'line', 'H\'')
 
     points(('I', 1, 1), ('J', 2, 3), ('K', 3, 1))
     triangle('IJK', 'triangle')
-    reflect_figure_about_line('triangle', 'FG', 'triangle_reflected')
+    reflect_figure_about_line('triangle', 'line', 'triangle_reflected')
 
     point('L', 1.5, -1.5)
     point('M', 2.5, -1.5)
@@ -236,8 +236,18 @@ def example17(scene):
     scene.wait(3)
 
 
+def example18(scene):
+    A = point('A', 0, 0, label_x=0.2, label_y=0.2)
+    B = point('B', 1, 1, label_x=1.3, label_y=1)
+
+    A.move(1, 0)
+    B.move(0, 1)
+
+    scene.wait(1)
+
+
 class Main(Scene):
     def construct(self):
         init(scene=self)
 
-        example17(self)
+        example18(self)

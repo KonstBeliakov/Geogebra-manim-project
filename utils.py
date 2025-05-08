@@ -6,7 +6,7 @@ from manim import TAU
 
 import figures
 import settings
-import triangle as trf
+import triangle as tr
 from circle import Circle, to_figure
 from figures import Figure
 from math_utils import *
@@ -330,16 +330,20 @@ def segment(p1: str | Point | tuple[float, float] = None,
     return Segment(_scene, p1, p2, label)
 
 @on_scene
-def point(name: str, x=None, y=None):
+def point(name: str, x=None, y=None, label_x=None, label_y=None):
     """
     Draw a point
     :param name - name of the point
     :param x - x position of the point
     :param y - y position of the point
+    :param label_x - (optional) x position of the label of the point
+    :param label_y - (optional) y position of the label of the point
     """
     return Point(_scene, name,
                  None if x is None else _new_position(x, y)[0],
-                 None if y is None else _new_position(x, y)[1])
+                 None if y is None else _new_position(x, y)[1],
+                 label_x=label_x,
+                 label_y=label_y)
 
 
 @on_scene
