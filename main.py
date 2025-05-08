@@ -242,6 +242,8 @@ def example18(scene):
 
     A.move(1, 0)
     B.move(0, 1)
+    hide_label(B)
+    B.move(1, 1)
 
     scene.wait(1)
 

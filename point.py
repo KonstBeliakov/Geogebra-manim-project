@@ -6,9 +6,11 @@ valid_point_names = [chr(i) for i in range(ord('A'), ord('Z') + 1)]
 user_point_names = []
 point_names = {}
 
+
 def mark_used_labels_for_points(labels):
     global user_point_names
     user_point_names = labels
+
 
 def get_point_by_name(name: str) -> Point:
     if name not in point_names:
@@ -54,15 +56,17 @@ def to_point(scene, point: str | Point | tuple[int | float, int | float] | list[
 
 
 class Point:
-    def __init__(self, scene, name=None, x=None, y=None, get_position=None, label_x=None, label_y=None):
+    def __init__(self, scene, name=None, x=None, y=None, get_position=None,
+                 label_x=None, label_y=None, show_label=True):
         """
         :param scene: scene where to draw a point
         :param name: name of the point (can use LaTeX)
         :param x: x coordinate of the point
         :param y: y coordinate of the point
         :param get_position: function that produces point coordinates
-        :param label_x - (optional) x position of the label of the point
-        :param label_y - (optional) y position of the label of the point
+        :param label_x: (optional) x position of the label of the point
+        :param label_y: (optional) y position of the label of the point
+        :param show_label: determines show label of the point on the scene or not
         """
         self.scene = scene
 
@@ -92,6 +96,8 @@ class Point:
         if name in valid_point_names:
             valid_point_names.remove(name)
 
+        self.show_label = show_label
+
         self.move_label_to(label_x, label_y)
 
         self.render()
@@ -106,7 +112,8 @@ class Point:
         else:
             label_delta_y = label_y - self.y
 
-        self.label_position = lambda: (self.x + label_delta_x, self.y + label_delta_y, 0)
+        self.label_position = lambda: (self.x + label_delta_x, self.y + label_delta_y, 0) if self.show_label else (
+        10 ** 18, 10 ** 18, 0)
 
     @property
     def x(self):
@@ -138,12 +145,13 @@ class Point:
         self.circle.add_updater(lambda m: m.move_to((self.x, self.y, 0)))
         self.scene.add(self.circle)
 
-        self.point_name_text = Text(self.name, font_size=30)
-        self.point_name_text.move_to(self.label_position())
-        self.scene.play(Write(self.point_name_text), run_time=point_label_render_time)
-        self.scene.wait(point_delay)
-        self.point_name_text.add_updater(lambda m: m.move_to(self.label_position()))
-        self.scene.add(self.point_name_text)
+        if self.show_label:
+            self.point_name_text = Text(self.name, font_size=30)
+            self.point_name_text.move_to(self.label_position())
+            self.scene.play(Write(self.point_name_text), run_time=point_label_render_time)
+            self.scene.wait(point_delay)
+            self.point_name_text.add_updater(lambda m: m.move_to(self.label_position()))
+            self.scene.add(self.point_name_text)
 
     def move(self, new_x, new_y, run_time=2):
         """
