@@ -96,24 +96,31 @@ class Point:
         if name in valid_point_names:
             valid_point_names.remove(name)
 
-        self.show_label = show_label
+        self._show_label = show_label
+
+        self.label_delta_x = default_label_offset_x
+        self.label_delta_y = default_label_offset_y
 
         self.move_label_to(label_x, label_y)
 
         self.render()
 
-    def move_label_to(self, label_x, label_y):
-        if label_x is None:
-            label_delta_x = default_label_offset_x
-        else:
-            label_delta_x = label_x - self.x
-        if label_x is None:
-            label_delta_y = default_label_offset_y
-        else:
-            label_delta_y = label_y - self.y
+    def move_label_to(self, label_x: float, label_y: float):
+        if label_x is not None:
+            self.label_delta_x = label_x - self.x
+        if label_y is not None:
+            self.label_delta_y = label_y - self.y
 
-        self.label_position = lambda: (self.x + label_delta_x, self.y + label_delta_y, 0) if self.show_label else (
-        10 ** 18, 10 ** 18, 0)
+        self.label_position = lambda: (self.x + self.label_delta_x, self.y + self.label_delta_y, 0)
+
+    @property
+    def show_label(self):
+        return self._show_label
+
+    @show_label.setter
+    def show_label(self, value):
+        self._show_label = value
+        self.point_name_text.set_opacity(1 if value else 0)
 
     @property
     def x(self):
@@ -145,13 +152,12 @@ class Point:
         self.circle.add_updater(lambda m: m.move_to((self.x, self.y, 0)))
         self.scene.add(self.circle)
 
-        if self.show_label:
-            self.point_name_text = Text(self.name, font_size=30)
-            self.point_name_text.move_to(self.label_position())
-            self.scene.play(Write(self.point_name_text), run_time=point_label_render_time)
-            self.scene.wait(point_delay)
-            self.point_name_text.add_updater(lambda m: m.move_to(self.label_position()))
-            self.scene.add(self.point_name_text)
+        self.point_name_text = Text(self.name, font_size=30)
+        self.point_name_text.move_to(self.label_position())
+        self.scene.play(Write(self.point_name_text), run_time=point_label_render_time)
+        self.scene.wait(point_delay)
+        self.point_name_text.add_updater(lambda m: m.move_to(self.label_position()))
+        self.scene.add(self.point_name_text)
 
     def move(self, new_x, new_y, run_time=2):
         """
