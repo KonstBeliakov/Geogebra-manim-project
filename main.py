@@ -242,6 +242,7 @@ def example18(scene):
 
     A.move(1, 0)
     B.move(0, 1)
+    B.move_label(0.2, 0.2, run_time=1)
     hide_label(B)
     B.move(1, 1)
     show_label(B)

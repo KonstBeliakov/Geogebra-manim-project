@@ -98,20 +98,39 @@ class Point:
 
         self._show_label = show_label
 
-        self.label_delta_x = default_label_offset_x
-        self.label_delta_y = default_label_offset_y
+        self.label_dx = ValueTracker(default_label_offset_x)
+        self.label_dy = ValueTracker(default_label_offset_y)
 
         self.move_label_to(label_x, label_y)
 
         self.render()
 
-    def move_label_to(self, label_x: float, label_y: float):
+    def move_label_to(self, label_x=None, label_y=None, run_time=0):
         if label_x is not None:
-            self.label_delta_x = label_x - self.x
+            target_dx = label_x - self.x
+        else:
+            target_dx = self.label_dx.get_value()
         if label_y is not None:
-            self.label_delta_y = label_y - self.y
+            target_dy = label_y - self.y
+        else:
+            target_dy = self.label_dy.get_value()
 
-        self.label_position = lambda: (self.x + self.label_delta_x, self.y + self.label_delta_y, 0)
+        self.label_position = lambda: (self.x + self.label_dx.get_value(), self.y + self.label_dy.get_value(), 0)
+
+        if run_time:
+            self.scene.play(
+                self.label_dx.animate.set_value(target_dx),
+                self.label_dy.animate.set_value(target_dy),
+                run_time=run_time
+            )
+        else:
+            self.label_dx.set_value(target_dx)
+            self.label_dy.set_value(target_dy)
+
+    def move_label(self, dx=0, dy=0, run_time=0):
+        self.move_label_to(label_x=self.x + self.label_dx.get_value() + dx,
+                           label_y=self.y + self.label_dy.get_value() + dy,
+                           run_time=run_time)
 
     @property
     def show_label(self):
