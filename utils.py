@@ -301,6 +301,8 @@ def circle(center: Point | str | tuple[int | float] = None,
     :label - optional label of the circle
     """
     return Circle(_scene, center=center, r=r, label=label)
+
+
 @on_scene
 def circle(center: Point | str | tuple[int | float] = None,
            r: float = 1,
@@ -313,24 +315,25 @@ def circle(center: Point | str | tuple[int | float] = None,
     """
     return Circle(_scene, center=center, r=r, label=label)
 
+
 @on_scene
 def circle_from_three_points(p1: str | Point | tuple[float, float],
-                          p2: str | Point | tuple[float, float],
-                          p3: str | Point | tuple[float, float],
-                          label: str = None,
-                          center_name: str = None):
+                             p2: str | Point | tuple[float, float],
+                             p3: str | Point | tuple[float, float],
+                             label: str = None,
+                             center_name: str = None):
     return Circle.from_three_points(_scene, p1, p2, p3, label, center_name)
-
 
 
 @on_scene
 def segment(p1: str | Point | tuple[float, float] = None,
-             p2: str | Point | tuple[float, float] = None,
-             label: str = None):
+            p2: str | Point | tuple[float, float] = None,
+            label: str = None):
     return Segment(_scene, p1, p2, label)
 
+
 @on_scene
-def point(name: str, x=None, y=None, label_x=None, label_y=None, show_label=True):
+def point(name: str, x=None, y=None, label_x=None, label_y=None, show_label=None):
     """
     Draw a point
     :param name - name of the point
@@ -347,9 +350,11 @@ def point(name: str, x=None, y=None, label_x=None, label_y=None, show_label=True
                  label_y=label_y,
                  show_label=show_label)
 
+
 @on_scene
 def show_label(point: str | Point | tuple[float, float]):
     to_point(_scene, point).show_label = True
+
 
 @on_scene
 def hide_label(point: str | Point | tuple[float, float]):
@@ -370,6 +375,7 @@ def points(*points_data):
         else:
             points.append(point(*point_data))
     return points
+
 
 @on_scene
 def _intersect_segments(segment1: str, segment2: str, point_name=None):
@@ -700,4 +706,3 @@ def mark_equal_angles(angles: list[list[str | Point]]):
         if len(angle) != 3:
             raise ValueError(f'The angle should consist from 3 points, not {len(angle)}.')
         ArcMark(_scene, *angle)
-

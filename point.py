@@ -1,5 +1,7 @@
 from manim import *
 from random import choice, uniform
+
+import settings
 from settings import *
 
 valid_point_names = [chr(i) for i in range(ord('A'), ord('Z') + 1)]
@@ -57,7 +59,7 @@ def to_point(scene, point: str | Point | tuple[int | float, int | float] | list[
 
 class Point:
     def __init__(self, scene, name=None, x=None, y=None, get_position=None,
-                 label_x=None, label_y=None, show_label=True):
+                 label_x=None, label_y=None, show_label=None):
         """
         :param scene: scene where to draw a point
         :param name: name of the point (can use LaTeX)
@@ -96,14 +98,24 @@ class Point:
         if name in valid_point_names:
             valid_point_names.remove(name)
 
-        self._show_label = show_label
-
         self.label_dx = ValueTracker(default_label_offset_x)
         self.label_dy = ValueTracker(default_label_offset_y)
+
+        self.update_label_position()
+
+        self._create_label()
+
+        if show_label is None:
+            self.show_label = settings.show_point_labels
+        else:
+            self.show_label = show_label
 
         self.move_label_to(label_x, label_y)
 
         self.render()
+
+    def update_label_position(self):
+        self.label_position = lambda: (self.x + self.label_dx.get_value(), self.y + self.label_dy.get_value(), 0)
 
     def move_label_to(self, label_x=None, label_y=None, run_time=0):
         if label_x is not None:
@@ -115,7 +127,7 @@ class Point:
         else:
             target_dy = self.label_dy.get_value()
 
-        self.label_position = lambda: (self.x + self.label_dx.get_value(), self.y + self.label_dy.get_value(), 0)
+        self.update_label_position()
 
         if run_time:
             self.scene.play(
@@ -136,10 +148,17 @@ class Point:
     def show_label(self):
         return self._show_label
 
+    def _create_label(self):
+        self.point_name_text = Text(self.name, font_size=30)
+        self.point_name_text.add_updater(lambda m: m.move_to(self.label_position()))
+        #self.scene.add(self.point_name_text)
+
     @show_label.setter
     def show_label(self, value):
         self._show_label = value
-        self.point_name_text.set_opacity(1 if value else 0)
+
+        if hasattr(self, "point_name_text"):
+            self.point_name_text.set_opacity(1 if value else 0)
 
     @property
     def x(self):
@@ -171,8 +190,8 @@ class Point:
         self.circle.add_updater(lambda m: m.move_to((self.x, self.y, 0)))
         self.scene.add(self.circle)
 
-        self.point_name_text = Text(self.name, font_size=30)
-        self.point_name_text.move_to(self.label_position())
+        #self.point_name_text = Text(self.name, font_size=30)
+        #self.point_name_text.move_to(self.label_position())
         self.scene.play(Write(self.point_name_text), run_time=point_label_render_time)
         self.scene.wait(point_delay)
         self.point_name_text.add_updater(lambda m: m.move_to(self.label_position()))

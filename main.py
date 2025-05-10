@@ -2,6 +2,7 @@ from random import randrange
 
 from manim import *
 
+import settings
 from tick import Tick
 from utils import *
 
@@ -241,12 +242,20 @@ def example18(scene):
     B = point('B', 1, 1, label_x=1.3, label_y=1)
 
     A.move(1, 0)
-    B.move(0, 1)
     B.move_label(0.2, 0.2, run_time=1)
+    B.move(0, 1)
     hide_label(B)
     B.move(1, 1)
     show_label(B)
     B.move(0, 1)
+
+    settings.show_point_labels = False
+
+    points(('C', 2, 2), ('D', -2, -2))
+
+    scene.wait(1)
+
+    show_label('C')
 
     scene.wait(1)
 
