@@ -35,7 +35,37 @@ def parse(ggb_file):
             used = {}
             triangle_heights = {}
 
-            for element in root:
+            def parse_point(element):
+                label = element.get("label").replace("'", "\\'")
+                coords = element.find("coords")
+                show = element.find("show")
+                label_offset = element.find("labelOffset")
+
+                x, y, z = float(coords.get("x")), float(coords.get("y")), float(coords.get("z"))
+
+                show_label = show.get("label") == "true"
+                x_offset, y_offset = None, None
+                if label_offset is not None:
+                    x_offset, y_offset = float(label_offset.get("x")), float(label_offset.get("y"))
+
+
+                return {
+                    "label" : label,
+                    "x" : x / z,
+                    "y" : y / z,
+                    "show_label": show_label,
+                    "x_offset": x_offset,
+                    "y_offset": y_offset,
+                }
+
+            def procces_label_for_point(info):
+                if info['show_label']:
+                    operations.append(f"show_label('{info['label']}')")
+                if info['x_offset'] or info['y_offset']:
+                    operations.append(f"{info['label']}.move_label_to({info['x_offset']}, {info['y_offset']})")
+
+            for it in range(len(root)):
+                element = root[it]
                 if element.tag == "element":
                     label = element.get("label").replace("'", "\\'")
                     if label in used:
@@ -43,9 +73,9 @@ def parse(ggb_file):
                     used[label] = True
                     element_type = element.get('type')
                     if element_type == 'point':
-                        coords = element.find("coords")
-                        x, y, z = float(coords.get("x")), float(coords.get("y")), float(coords.get("z"))
-                        operations.append(f"point('{label}', {x}, {y})")
+                        info = parse_point(element)
+                        operations.append(f"point('{label}', {info['x']}, {info['y']}, label_x={info['x_offset']}, label_y={info['y_offset']}, show_label={info['show_label']})")
+
                     elif element_type == 'vector':
                         coords = element.find("coords")
                         x, y, z = float(coords.get("x")), float(coords.get("y")), float(coords.get("z"))
@@ -71,8 +101,12 @@ def parse(ggb_file):
                     elif command_name == 'Midpoint':
                         a, b = inputs.get('a0'), inputs.get('a1')
                         label = outputs.get('a0')
+                        info = parse_point(root[it+1])
                         used[label] = True
                         operations.append(f"midPoint('{a}', '{b}', '{label}')")
+                        procces_label_for_point(info)
+                        it += 1
+                        continue
 
                     elif command_name == 'Polygon':
                         points = [inputs.get(f"a{i}") for i in range(len(inputs.attrib))]
@@ -88,7 +122,13 @@ def parse(ggb_file):
                         labels = tuple(outputs.get(f'a{i}', None) for i in range(2))
                         for label in labels:
                             used[label] = True
+                        intersection_result_type = root[it+1].get('type')
                         operations.append(f"intersect_figures('{a}', '{b}', {labels})")
+                        if intersection_result_type == 'point':
+                            info = parse_point(root[it+1])
+                            procces_label_for_point(info)
+                            it += 1
+                            continue
 
                     elif command_name == "Circle":
                         center = inputs.get("a0")
@@ -114,6 +154,11 @@ def parse(ggb_file):
                             triangle_heights[str] = []
                         triangle_heights[str].append(f'{a + d}')
                         used[d] = True
+                        info = parse_point(root[it+1])
+                        procces_label_for_point(info)
+                        it += 1
+                        continue
+
 
                     elif command_name == "TriangleCenter":
                         a, b, c, center_type = inputs.get('a0'), inputs.get('a1'), inputs.get('a2'), inputs.get('a3')
@@ -126,30 +171,26 @@ def parse(ggb_file):
                         str = ''.join(abc)
                         segments = triangle_heights.get(str)
                         operations.append(f"intersect_figures('{segments[0]}', '{segments[1]}', ('{label}'))")
+                        info = parse_point(root[it+1])
+                        procces_label_for_point(info)
+                        it += 1
+                        continue
 
                     elif command_name == "Mirror":
                         a, b = inputs.get('a0'), inputs.get('a1')
                         label = outputs.get('a0')
                         used[label] = True
                         operations.append(f"reflect_point_about_line('{a}', '{b}', '{label}')")
+                        info = parse_point(root[it + 1])
+                        procces_label_for_point(info)
+                        it += 1
+                        continue
                     # todo
                     elif command_name == 'Line':
                         a, b = inputs.get('a0'), inputs.get('a1')
                         label = outputs.get('a0')
                         used[label] = True
                         operations.append(f"Line('{a}', '{b}', '{label}')")
-
-                    elif command_name == 'Ray':
-                        a, b = inputs.get('a0'), inputs.get('a1')
-                        label = outputs.get('a0')
-                        used[label] = True
-                        operations.append(f"Ray(self, '{a}', '{b}', '{label}')")
-
-                    elif command_name == 'Vector':
-                        a, b = inputs.get('a0'), inputs.get('a1')
-                        label = outputs.get('a0')
-                        used[label] = True
-                        operations.append(f"Vector(self, '{a}', '{b}', '{label}')")
 
                     elif command_name == 'PerpendicularLine':
                         point, line = inputs.get('a0'), inputs.get('a1')
@@ -169,22 +210,5 @@ def parse(ggb_file):
                         used[label] = True
                         operations.append(f"Angle(self, '{a}', '{b}', '{c}', '{label}')")
 
-                    elif command_name == 'Ellipse':
-                        f1, f2, point = inputs.get('a0'), inputs.get('a1'), inputs.get('a2')
-                        label = outputs.get('a0')
-                        used[label] = True
-                        operations.append(f"Ellipse(self, '{f1}', '{f2}', '{point}', '{label}')")
-
-                    elif command_name == 'Hyperbola':
-                        f1, f2, point = inputs.get('a0'), inputs.get('a1'), inputs.get('a2')
-                        label = outputs.get('a0')
-                        used[label] = True
-                        operations.append(f"Hyperbola(self, '{f1}', '{f2}', '{point}', '{label}')")
-
-                    elif command_name == 'Parabola':
-                        focus, directrix = inputs.get('a0'), inputs.get('a1')
-                        label = outputs.get('a0')
-                        used[label] = True
-                        operations.append(f"Parabola(self, '{focus}', '{directrix}', '{label}')")
 
     return operations, list(used.keys())
