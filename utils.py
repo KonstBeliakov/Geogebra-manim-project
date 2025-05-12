@@ -362,6 +362,14 @@ def hide_label(point: str | Point | tuple[float, float]):
 
 
 @on_scene
+def move_label(point: str | Point | tuple[float, float],
+               label_x: float = None,
+               label_y: float = None,
+               run_time: float = 0):
+    to_point(_scene, point).move_label_to(label_x=label_x, label_y=label_y, run_time=run_time)
+
+
+@on_scene
 def points(*points_data):
     """
     Function for creation of multiple points
