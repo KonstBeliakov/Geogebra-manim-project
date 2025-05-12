@@ -20,7 +20,7 @@ def get_point_by_name(name: str) -> Point:
     return point_names[name]
 
 
-def get_point_or_random(scene, name: str | None) -> Point:
+def get_point_or_random(scene, name: str | None, show_point=True) -> Point:
     """
     Get a point instance by it's name or generate Point instance with such name if there is no such point
     :param scene: scene where will be generated a new point
@@ -29,15 +29,16 @@ def get_point_or_random(scene, name: str | None) -> Point:
     """
     if name in point_names:
         return point_names[name]
-    return Point(scene, name)
+    return Point(scene, name, show_point=show_point)
 
 
-def to_point(scene, point: str | Point | tuple[int | float, int | float] | list[int | float, int | float] | None):
+def to_point(scene, point: str | Point | tuple[int | float, int | float] | list[int | float, int | float] | None,
+             show_point=True):
     match point:
         case None:
-            return Point(scene)
+            return Point(scene, show_point=show_point)
         case str():
-            return get_point_or_random(scene, point)
+            return get_point_or_random(scene, point, show_point=show_point)
         case Point():
             return point
         case tuple() | list():
@@ -52,7 +53,7 @@ def to_point(scene, point: str | Point | tuple[int | float, int | float] | list[
                 if abs(p.x - point[0]) < 10 ** -6 and abs(p.y - point[1]) < 10 ** -6:
                     return p
 
-            return Point(scene, x=point[0], y=point[1])
+            return Point(scene, x=point[0], y=point[1], show_point=show_point)
         case default:
             raise TypeError(f'Can\'t create a point from the argument of type {type(point)}')
 
@@ -164,6 +165,8 @@ class Point:
         self._show_label = value
 
         if hasattr(self, "point_name_text"):
+            if value:
+                self.scene.play(Write(self.point_name_text), run_time=point_label_render_time)
             self.point_name_text.set_opacity(1 if value else 0)
 
     @property
@@ -189,16 +192,21 @@ class Point:
         return True
 
     def render(self):
-        self.circle = Circle(radius=0.05, color=LINES_COLOR, fill_opacity=(1 if self._show_point else 0))
+        opacity = (1 if self._show_point else 0)
+        self.circle = Circle(radius=0.05, color=LINES_COLOR,
+                             fill_opacity=opacity,
+                             stroke_opacity=opacity)
         self.circle.move_to((self.x, self.y, 0))
         self.scene.play(Create(self.circle), run_time=point_render_time)
         self.scene.wait(point_delay)
         self.circle.add_updater(lambda m: m.move_to((self.x, self.y, 0)))
         self.scene.add(self.circle)
 
-        self.point_name_text = Text(self.name, font_size=30, fill_opacity=(1 if self._show_label else 0))
+        self.point_name_text = Text(self.name, font_size=30,
+                                    fill_opacity=(1 if self._show_label and self._show_point else 0))
         self.point_name_text.move_to(self.label_position())
-        self.scene.play(Write(self.point_name_text), run_time=point_label_render_time)
+        if self._show_label and self._show_point:
+            self.scene.play(Write(self.point_name_text), run_time=point_label_render_time)
         self.scene.wait(point_delay)
         self.point_name_text.add_updater(lambda m: m.move_to(self.label_position()))
         self.scene.add(self.point_name_text)

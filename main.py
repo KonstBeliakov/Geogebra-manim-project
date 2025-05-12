@@ -277,8 +277,18 @@ def example20(scene):
     scene.wait(1)
 
 
+def example21(scene):
+    settings.show_circle_centers = False
+    C = circle((0, 0), 1)
+    scene.wait(1)
+    point('X')
+    C.show_center()
+    C.center.show_label = True
+    scene.wait(1)
+
+
 class Main(Scene):
     def construct(self):
         init(scene=self)
 
-        example20(self)
+        example21(self)

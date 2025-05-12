@@ -137,7 +137,7 @@ def height(triangle: str, segment_name: str):
 
 
 @on_scene
-def triangle(pointNames: str, label=None, render=True):
+def triangle(pointNames: str, label=None, segment_labels=None, render=True):
     """
     Convenience wrapper around :class:`triangle.Triangle`.
 
@@ -145,7 +145,8 @@ def triangle(pointNames: str, label=None, render=True):
     :param label : str | None - Optional label for the triangle itself.
     :returns Triangle
     """
-    return tr.Triangle(scene=_scene, p1=pointNames[0], p2=pointNames[1], p3=pointNames[2], label=label, render=render)
+    return tr.Triangle(scene=_scene, p1=pointNames[0], p2=pointNames[1], p3=pointNames[2], label=label,
+                       segment_labels=segment_labels, render=render)
 
 
 def line_coefficients(p1: Point, p2: Point) -> tuple[float, float, float]:
