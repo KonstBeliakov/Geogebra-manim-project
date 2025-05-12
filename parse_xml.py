@@ -62,7 +62,7 @@ def parse(ggb_file):
                 if info['show_label']:
                     operations.append(f"show_label('{info['label']}')")
                 if info['x_offset'] or info['y_offset']:
-                    operations.append(f"{info['label']}.move_label_to({info['x_offset']}, {info['y_offset']})")
+                    operations.append(f"move_label('{info['label']}', {info['x_offset']}, {info['y_offset']})")
 
             for it in range(len(root)):
                 element = root[it]
