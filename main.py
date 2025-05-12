@@ -260,8 +260,17 @@ def example18(scene):
     scene.wait(1)
 
 
+def example19(scene):
+    A = point('A')
+    scene.wait(1)
+    hide_point('A')
+    scene.wait(1)
+    show_point('A')
+    scene.wait(1)
+
+
 class Main(Scene):
     def construct(self):
         init(scene=self)
 
-        example18(self)
+        example19(self)

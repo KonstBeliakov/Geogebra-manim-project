@@ -333,7 +333,7 @@ def segment(p1: str | Point | tuple[float, float] = None,
 
 
 @on_scene
-def point(name: str, x=None, y=None, label_x=None, label_y=None, show_label=None):
+def point(name: str, x=None, y=None, label_x=None, label_y=None, show_label=None, show_point=True):
     """
     Draw a point
     :param name - name of the point
@@ -348,7 +348,8 @@ def point(name: str, x=None, y=None, label_x=None, label_y=None, show_label=None
                  None if y is None else _new_position(x, y)[1],
                  label_x=label_x,
                  label_y=label_y,
-                 show_label=show_label)
+                 show_label=show_label,
+                 show_point=show_point)
 
 
 @on_scene
@@ -359,6 +360,16 @@ def show_label(point: str | Point | tuple[float, float]):
 @on_scene
 def hide_label(point: str | Point | tuple[float, float]):
     to_point(_scene, point).show_label = False
+
+
+@on_scene
+def show_point(point: str | Point | tuple[float, float]):
+    to_point(_scene, point).show_point = True
+
+
+@on_scene
+def hide_point(point: str | Point | tuple[float, float]):
+    to_point(_scene, point).show_point = False
 
 
 @on_scene
