@@ -34,6 +34,7 @@ def parse(ggb_file):
             operations = []
             used = {}
             triangle_heights = {}
+            triangle_short_name = {}
 
             def parse_point(element):
                 label = element.get("label").replace("'", "\\'")
@@ -113,6 +114,9 @@ def parse(ggb_file):
                         labels = [outputs.get(f"a{i}") for i in range(len(outputs.attrib))]
                         if len(points) == 3:
                             operations.append(f"triangle('{points[0] + points[1] + points[2]}', '{labels[0]}', ['{labels[1]}', '{labels[2]}', '{labels[3]}'] )")
+                            triangle_short_name[points[0] + points[1] + points[2]] = labels[0]
+                            triangle_short_name[points[1] + points[2] + points[0]] = labels[0]
+                            triangle_short_name[points[2] + points[0] + points[1]] = labels[0]
                             continue
                         for i in range(len(points)):
                             operations.append(
@@ -122,7 +126,7 @@ def parse(ggb_file):
 
                     elif command_name == 'Intersect':
                         a, b, index_str = inputs.get('a0'), inputs.get('a1'), inputs.get('a2')
-                        labels = tuple(outputs.get(f'a{i}', None) for i in range(2))
+                        labels = tuple(outputs.get(f"a{i}") for i in range(len(outputs.attrib)))
                         for label in labels:
                             used[label] = True
                         intersection_result_type = root[it+1].get('type')
@@ -166,7 +170,7 @@ def parse(ggb_file):
                         a, b, c, center_type = inputs.get('a0'), inputs.get('a1'), inputs.get('a2'), inputs.get('a3')
                         label = outputs.get('a0')
                         if center_type == "1":
-                            operations.append(f"inscribed_circle_center('{a + b + c}', '{label}')")
+                            operations.append(f"inscribed_circle_center('{triangle_short_name[a + b + c]}', '{label}')")
                             used[label] = True
                             info = parse_point(root[it+1])
                             procces_label_for_point(info)
@@ -200,7 +204,7 @@ def parse(ggb_file):
                         a, b, c = inputs.get('a0'), inputs.get('a1'), inputs.get('a2')
                         label = outputs.get('a0')
                         used[label] = True
-                        operations.append(f"inscribed_circle('{a + b + c}', circle_label='{label}')")
+                        operations.append(f"inscribed_circle('{triangle_short_name[a + b + c]}', circle_label='{label}')")
 
 
     return operations, list(used.keys())

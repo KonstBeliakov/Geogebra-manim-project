@@ -591,6 +591,16 @@ def inscribed_circle(triangle: str | Triangle,
     return Circle(_scene, center=center,
                   get_r=lambda: incenter_and_inradius(triangle.p1, triangle.p2, triangle.p3)[1], label=circle_label)
 
+@on_scene
+def inscribed_circle_center(triangle: str | Triangle,
+                     label: str = None):
+
+    triangle = to_figure(triangle)
+
+    return Point(_scene, name=label,
+                   get_position=lambda: incenter_and_inradius(triangle.p1, triangle.p2, triangle.p3)[0])
+
+
 
 @on_scene
 def point_on_circle(circle: str | Circle, pointName=None):
