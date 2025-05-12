@@ -1,4 +1,6 @@
 from manim import *
+
+import settings
 from figures import *
 from settings import *
 from point import Point, to_point
@@ -24,13 +26,16 @@ class Circle(Figure):
         :param label:  label for the circle.
         """
         self.scene = scene
-        self.center = to_point(scene, center)
+        self.center = to_point(scene, center, show_point=settings.show_circle_centers)
         self._get_radius = get_r
 
         if self._get_radius is None:
             self.r_tracker = ValueTracker(r)
 
         super().__init__(scene, label=label, render=render)
+
+    def show_center(self):
+        self.center.show_point = True
 
     @property
     def r(self) -> float:
