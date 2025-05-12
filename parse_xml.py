@@ -111,6 +111,9 @@ def parse(ggb_file):
                     elif command_name == 'Polygon':
                         points = [inputs.get(f"a{i}") for i in range(len(inputs.attrib))]
                         labels = [outputs.get(f"a{i}") for i in range(len(outputs.attrib))]
+                        if len(points) == 3:
+                            operations.append(f"triangle('{points[0] + points[1] + points[2]}', '{labels[0]}', ['{labels[1]}', '{labels[2]}', '{labels[3]}'] )")
+                            continue
                         for i in range(len(points)):
                             operations.append(
                                 f"segment('{points[i]}', '{points[(i + 1) % len(points)]}', '{labels[i + 1]}')"
@@ -159,10 +162,17 @@ def parse(ggb_file):
                         it += 1
                         continue
 
-
                     elif command_name == "TriangleCenter":
                         a, b, c, center_type = inputs.get('a0'), inputs.get('a1'), inputs.get('a2'), inputs.get('a3')
                         label = outputs.get('a0')
+                        if center_type == "1":
+                            operations.append(f"inscribed_circle_center('{a + b + c}', '{label}')")
+                            used[label] = True
+                            info = parse_point(root[it+1])
+                            procces_label_for_point(info)
+                            it += 1
+                            continue
+
                         if center_type != "4":  # todo
                             continue
                         used[label] = True
@@ -185,30 +195,12 @@ def parse(ggb_file):
                         procces_label_for_point(info)
                         it += 1
                         continue
-                    # todo
-                    elif command_name == 'Line':
-                        a, b = inputs.get('a0'), inputs.get('a1')
-                        label = outputs.get('a0')
-                        used[label] = True
-                        operations.append(f"Line('{a}', '{b}', '{label}')")
 
-                    elif command_name == 'PerpendicularLine':
-                        point, line = inputs.get('a0'), inputs.get('a1')
-                        label = outputs.get('a0')
-                        used[label] = True
-                        operations.append(f"PerpendicularLine(self, '{point}', '{line}', '{label}')")
-
-                    elif command_name == 'ParallelLine':
-                        point, line = inputs.get('a0'), inputs.get('a1')
-                        label = outputs.get('a0')
-                        used[label] = True
-                        operations.append(f"ParallelLine(self, '{point}', '{line}', '{label}')")
-
-                    elif command_name == 'Angle':
+                    elif command_name == "Incircle":
                         a, b, c = inputs.get('a0'), inputs.get('a1'), inputs.get('a2')
                         label = outputs.get('a0')
                         used[label] = True
-                        operations.append(f"Angle(self, '{a}', '{b}', '{c}', '{label}')")
+                        operations.append(f"inscribed_circle('{a + b + c}', circle_label='{label}')")
 
 
     return operations, list(used.keys())
