@@ -184,10 +184,10 @@ def segment_circle_intersection_positions(segment, circle):
                 xi = x1 + t * dx
                 yi = y1 + t * dy
                 intersections.append((xi, yi))
-    if len(intersections) == 0:
-        intersections.append(None)
-    if len(intersections) == 1:
-        intersections.append(None)
+
+    if math.dist(intersections[0], intersections[1]) < 10 ** -9:
+        intersections[1] = None
+
     return intersections
 
 

@@ -287,8 +287,16 @@ def example21(scene):
     scene.wait(1)
 
 
+def example22(scene):
+    c = circle((0, 0), 1)
+    points(('A', -1, 1), ('B', 1, 1))
+    s = segment('A', 'B')
+    intersect_figures(s, c, pointNames=('X', 'Y'))
+    scene.wait(1)
+
+
 class Main(Scene):
     def construct(self):
         init(scene=self)
 
-        example21(self)
+        example22(self)
