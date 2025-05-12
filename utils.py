@@ -99,7 +99,7 @@ def median(triangle: str, segment_name: str) -> Point:
     """
 
     def midpoint_builder(scene, p1, A, B, name):
-        return midPoint(scene, A, B, name=name)
+        return midPoint(A, B, name=name)
 
     return prepare_segment(_scene, triangle, segment_name, midpoint_builder)
 

@@ -269,8 +269,16 @@ def example19(scene):
     scene.wait(1)
 
 
+def example20(scene):
+    points(('A', 0, 0), ('B', 2, 2), ('C', 2, 0), ('D', 0.6, 1.4), ('E', 1.4, 0.6))
+    triangle('ABC')
+    segment('D', 'E')
+    intersect_figures('DE', 'AB', pointNames=('X',))
+    scene.wait(1)
+
+
 class Main(Scene):
     def construct(self):
         init(scene=self)
 
-        example19(self)
+        example20(self)

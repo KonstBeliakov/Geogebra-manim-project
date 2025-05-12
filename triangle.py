@@ -3,6 +3,8 @@ from point import *
 from settings import *
 from utils import *
 from math_utils import *
+
+from segment import *
 from figures import Figure
 
 
@@ -22,6 +24,11 @@ class Triangle(Figure):
         self.p1 = to_point(scene, p1)
         self.p2 = to_point(scene, p2)
         self.p3 = to_point(scene, p3)
+
+        # Maby creating 3 segments for a triangle is not very good idea...
+        self.s1 = Segment(scene, self.p1, self.p2, label=f'{self.p1.name}{self.p2.name}', render=False)
+        self.s2 = Segment(scene, self.p2, self.p3, label=f'{self.p2.name}{self.p3.name}', render=False)
+        self.s3 = Segment(scene, self.p3, self.p1, label=f'{self.p3.name}{self.p1.name}', render=False)
 
         super().__init__(scene, label=label)
 

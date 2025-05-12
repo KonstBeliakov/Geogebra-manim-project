@@ -14,7 +14,7 @@ def mark_used_labels_for_figures(labels):
 
 
 class Figure(ABC):
-    def __init__(self, scene, label=None):
+    def __init__(self, scene, label=None, render=True):
         if label is None:
             for l in valid_figure_labels:
                 if l not in user_figure_labels:
@@ -32,7 +32,8 @@ class Figure(ABC):
 
         self.scene = scene
 
-        self.render()
+        if render:
+            self.render()
 
     @abstractmethod
     def render(self):

@@ -22,3 +22,4 @@ default_label_offset_x = 0
 default_label_offset_y = 0.3
 
 show_point_labels = True
+show_circle_centers = True

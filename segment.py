@@ -9,7 +9,8 @@ class Segment(Figure):
     def __init__(self, scene,
                  p1: str | Point | tuple[float, float] = None,
                  p2: str | Point | tuple[float, float] = None,
-                 label: str = None):
+                 label: str = None,
+                 render=True):
         """
         :param scene: scene where to draw the segment
         :param p1: Point instance or name of the point or it's coordinates. (If there is no such point it will be created)
@@ -20,7 +21,7 @@ class Segment(Figure):
         self.p1 = to_point(scene, p1)
         self.p2 = to_point(scene, p2)
 
-        super().__init__(scene, label=label)
+        super().__init__(scene, label=label, render=render)
 
     @property
     def length(self):
