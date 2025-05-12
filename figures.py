@@ -47,6 +47,8 @@ def _segment_from_points(points: str | tuple[str, str] | list[str, str]):
         return None
 
     target = set(points)
+    if len(target) != 2:
+        return None
     for f in figure_names.values():
         if hasattr(f, 'p1') and hasattr(f, 'p2'):
             if {f.p1.name, f.p2.name} == target:

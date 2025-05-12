@@ -137,7 +137,7 @@ def height(triangle: str, segment_name: str):
 
 
 @on_scene
-def triangle(pointNames: str, label=None):
+def triangle(pointNames: str, label=None, render=True):
     """
     Convenience wrapper around :class:`triangle.Triangle`.
 
@@ -145,7 +145,7 @@ def triangle(pointNames: str, label=None):
     :param label : str | None - Optional label for the triangle itself.
     :returns Triangle
     """
-    return tr.Triangle(scene=_scene, p1=pointNames[0], p2=pointNames[1], p3=pointNames[2], label=label)
+    return tr.Triangle(scene=_scene, p1=pointNames[0], p2=pointNames[1], p3=pointNames[2], label=label, render=render)
 
 
 def line_coefficients(p1: Point, p2: Point) -> tuple[float, float, float]:
@@ -293,14 +293,15 @@ def reflect_figure_about_line(
 @on_scene
 def circle(center: Point | str | tuple[int | float] = None,
            r: float = 1,
-           label: str = None):
+           label: str = None,
+           render=True):
     """
     Draw a circle
     :param center - center of the circle
     :param r - radius of the circle
     :label - optional label of the circle
     """
-    return Circle(_scene, center=center, r=r, label=label)
+    return Circle(_scene, center=center, r=r, label=label, render=render)
 
 
 @on_scene
@@ -328,8 +329,9 @@ def circle_from_three_points(p1: str | Point | tuple[float, float],
 @on_scene
 def segment(p1: str | Point | tuple[float, float] = None,
             p2: str | Point | tuple[float, float] = None,
-            label: str = None):
-    return Segment(_scene, p1, p2, label)
+            label: str = None,
+            render=True):
+    return Segment(_scene, p1, p2, label, render=render)
 
 
 @on_scene

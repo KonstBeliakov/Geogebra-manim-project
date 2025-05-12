@@ -12,7 +12,8 @@ class Circle(Figure):
         center: Point | str | tuple[float, float] = None,
         r: float = 1,
         get_r=None,
-        label: str = None
+        label: str = None,
+        render=True
     ):
         """
         :param scene:  the scene where the circle will be drawn.
@@ -29,7 +30,7 @@ class Circle(Figure):
         if self._get_radius is None:
             self.r_tracker = ValueTracker(r)
 
-        super().__init__(scene, label=label)
+        super().__init__(scene, label=label, render=render)
 
     @property
     def r(self) -> float:
