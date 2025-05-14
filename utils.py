@@ -22,7 +22,11 @@ def midPoint(p1: Point, p2: Point, name=None):
 
 
 _scene = None
-_new_position = lambda x, y: (x, y)
+
+
+# function that calculates new position of points with respect to scaling (by default it does not change coordinates)
+def _new_position(x, y):
+    return x, y
 
 
 def init(scene):
@@ -333,11 +337,23 @@ def point(name: str, x=None, y=None, label_x=None, label_y=None, show_label=None
     :param label_y - (optional) y position of the label of the point
     :param show_label: determines show label of the point on the scene or not
     """
+    # x_new = None if x is None else _new_position(x, y)[0]
+    # print(f'x: {x}, x_new: {x_new}')
+    #
+    # y_new = None if y is None else _new_position(x, y)[1]
+    # print(f'y: {y}, y_new: {y_new}')
+    #
+    # label_x_new = None if label_x is None else _new_position(label_x, label_y)[0]
+    # print(f'label_x: {label_x}, label_x_new: {label_x_new}')
+    #
+    # label_y_new = None if label_y is None else _new_position(label_x, label_y)[1]
+    # print(f'label_y: {label_y}, label_y_new: {label_y_new}')
+
     return Point(_scene, name,
-                 None if x is None else _new_position(x, y)[0],
-                 None if y is None else _new_position(x, y)[1],
-                 label_x=label_x,
-                 label_y=label_y,
+                 x=None if x is None else _new_position(x, y)[0],
+                 y=None if y is None else _new_position(x, y)[1],
+                 label_x=None if label_x is None else _new_position(label_x, label_y)[0],
+                 label_y=None if label_y is None else _new_position(label_x, label_y)[1],
                  show_label=show_label,
                  show_point=show_point)
 
@@ -617,7 +633,7 @@ def point_on_circle(circle: str | Circle, pointName=None):
 
 
 @on_scene
-def move_points(points, positions, run_time=2):
+def move_points(points, positions, scale_factor, run_time=2):
     """
     Animate multiple points to new positions
     :param points – list of points
@@ -627,6 +643,8 @@ def move_points(points, positions, run_time=2):
     _scene.play(
         *[point.x_tracker.animate.set_value(new_x) for point, (new_x, _) in zip(points, positions)],
         *[point.y_tracker.animate.set_value(new_y) for point, (_, new_y) in zip(points, positions)],
+        *[point.label_dx.animate.set_value(point.label_dx.get() * scale_factor) for point in points],
+        *[point.label_dy.animate.set_value(point.label_dx.get() * scale_factor) for point in points],
         run_time=run_time
     )
 
@@ -697,7 +715,9 @@ def recenter_camera(point_cords=None, run_time=2):
     _new_position = new_position
 
     if points:
-        move_points(points, [new_position(point.x, point.y) for point in points], run_time=run_time)
+        move_points(points, [new_position(point.x, point.y) for point in points],
+                    run_time=run_time,
+                    scale_factor=scale_factor)
 
 
 @on_scene
