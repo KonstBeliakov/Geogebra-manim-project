@@ -137,15 +137,18 @@ def parse(ggb_file):
                     elif command_name == "Circle":
                         center = inputs.get("a0")
                         radius_or_point = inputs.get("a1")
+                        p = inputs.get("a2")
                         label = outputs.get('a0')
                         used[label] = True
                         try:
                             radius = float(radius_or_point)
                             operations.append(f"circle('{center}', {radius}, '{label}')")
                         except ValueError:
-                            p = inputs.get("a2")
-                            operations.append(
-                                f"circle_from_three_points('{center}', '{radius_or_point}', '{p}', '{label}')")
+                            if not p:
+                                operations.append(f"circle_from_two_points('{center}', '{radius_or_point}', '{label}')")
+                            else:
+                                operations.append(
+                                    f"circle_from_three_points('{center}', '{radius_or_point}', '{p}', '{label}')")
 
                     elif command_name == "Alt":
                         a, b, c = inputs.get('a0'), inputs.get('a1'), inputs.get('a2')

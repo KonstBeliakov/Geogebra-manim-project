@@ -5,6 +5,7 @@ from figures import *
 from settings import *
 from point import Point, to_point
 from math_utils import *
+import math
 
 
 class Circle(Figure):
@@ -24,6 +25,7 @@ class Circle(Figure):
         :param get_r:  a lambda/function returning the current radius; if provided,
                        the circle will update dynamically based on this function.
         :param label:  label for the circle.
+        :param render: whether to render the circle immediately.
         """
         self.scene = scene
         self.center = to_point(scene, center, show_point=settings.show_circle_centers)
@@ -96,15 +98,43 @@ class Circle(Figure):
         :param p2: second point (Point object, point name as a string, or (x, y) tuple).
         :param p3: third point (Point object, point name as a string, or (x, y) tuple).
         :param label: optional label for the circle.
-        :param center_name: optional name for the center point.
         :return: an instance of Circle with a dynamically computed center and radius.
         """
-        # Convert inputs to Point objects
         p1 = to_point(scene, p1)
         p2 = to_point(scene, p2)
         p3 = to_point(scene, p3)
 
-        # Create a dynamic center point using a lambda that computes the center.
-        center = Point(scene, name=center_name, get_position=lambda: get_circumscribed_pos_r(p1, p2, p3)[0])
-        # Create the circle with a dynamic radius using the get_center_and_radius function.
-        return cls(scene, center=center, get_r=lambda: get_circumscribed_pos_r(p1, p2, p3)[1], label=label)
+        center = Point(
+            scene,
+            name=center_name,
+            get_position=lambda: get_circumscribed_pos_r(p1, p2, p3)[0],
+        )
+        return cls(
+            scene,
+            center=center,
+            get_r=lambda: get_circumscribed_pos_r(p1, p2, p3)[1],
+            label=label
+        )
+
+    @classmethod
+    def from_two_points(cls, scene,
+                        center_pt: str | Point | tuple[float, float],
+                        boundary_pt: str | Point | tuple[float, float],
+                        label: str = None):
+        """
+        Alternative constructor to create a circle from a center and a point on its circumference.
+        :param scene:       the scene where the circle will be drawn.
+        :param center_pt:   center of the circle (Point object, point name as a string, or (x, y) tuple).
+        :param boundary_pt: a point on the circumference (Point object, point name, or (x, y) tuple).
+        :param label:       optional label for the circle.
+        :return: an instance of Circle with a dynamically computed radius.
+        """
+        center = to_point(scene, center_pt, show_point=settings.show_circle_centers)
+        boundary = to_point(scene, boundary_pt)
+
+        return cls(
+            scene,
+            center=center,
+            get_r=lambda: math.hypot(boundary.x - center.x, boundary.y - center.y),
+            label=label
+        )
