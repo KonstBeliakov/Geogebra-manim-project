@@ -99,7 +99,7 @@ class Point:
         if name in valid_point_names:
             valid_point_names.remove(name)
 
-        self.label_dx = ValueTracker(default_label_offset_x if label_x is None else label_y)
+        self.label_dx = ValueTracker(default_label_offset_x if label_x is None else label_x)
         self.label_dy = ValueTracker(default_label_offset_y if label_y is None else label_y)
 
         self.update_label_position()

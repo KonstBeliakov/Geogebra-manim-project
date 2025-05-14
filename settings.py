@@ -25,4 +25,4 @@ show_point_labels = True
 show_circle_centers = True
 
 # pixels -> manim position
-label_position_scaling_factor = 0.005
+label_position_scaling_factor = 0.008
