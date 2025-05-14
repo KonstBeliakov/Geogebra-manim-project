@@ -185,7 +185,20 @@ class Point:
             return self._get_position()[1]
         return self.y_tracker.get_value()
 
-    @pr nscene.wait(point_delay)
+    @property
+    def active(self):
+        if self._get_position is not None:
+            return self._get_position() is not None
+        return True
+
+    def render(self):
+        opacity = (1 if self._show_point else 0)
+        self.circle = Circle(radius=0.05, color=LINES_COLOR,
+                             fill_opacity=opacity,
+                             stroke_opacity=opacity)
+        self.circle.move_to((self.x, self.y, 0))
+        self.scene.play(Create(self.circle), run_time=point_render_time)
+        self.scene.wait(point_delay)
         self.circle.add_updater(lambda m: m.move_to((self.x, self.y, 0)))
         self.scene.add(self.circle)
 
