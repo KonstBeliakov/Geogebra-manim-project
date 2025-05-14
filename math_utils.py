@@ -3,6 +3,9 @@ import math
 from point import Point
 
 
+def get_distance(A, B):
+    return math.sqrt((A.x - B.x)**2 + (A.y - B.y)**2)
+
 def get_bisector_position(vertex, A, B):
     """
     A function that will calculate the coordinates of the intersection of the bisector
@@ -299,3 +302,24 @@ def get_orthocenter(p1: Point, p2: Point, p3: Point) -> (float, float):
     Hy = y1 + y2 + y3 - 2 * Uy
 
     return Hx, Hy
+
+
+def get_centroid(p1: Point, p2: Point, p3: Point) -> (float, float):
+    """
+    Return the centroid (intersection of the medians) of triangle p1,p2,p3.
+    Raises ValueError if the points are collinear.
+    """
+    x1, y1 = p1.x, p1.y
+    x2, y2 = p2.x, p2.y
+    x3, y3 = p3.x, p3.y
+
+    # Check for degeneracy via area = 0
+    area2 = x1*(y2-y3) + x2*(y3-y1) + x3*(y1-y2)
+    if abs(area2) < 1e-9:
+        raise ValueError(
+            f"Triangle {p1}, {p2}, {p3} is degenerate or collinear; no unique centroid."
+        )
+
+    Cx = (x1 + x2 + x3) / 3.0
+    Cy = (y1 + y2 + y3) / 3.0
+    return Cx, Cy

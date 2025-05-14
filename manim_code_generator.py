@@ -14,6 +14,7 @@ from point import *
 from segment import *
 from utils import *
 
+
 class MyScene(Scene):
     def construct(self):
         init(self)
