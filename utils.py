@@ -306,19 +306,6 @@ def circle(center: Point | str | tuple[int | float] = None,
 
 
 @on_scene
-def circle(center: Point | str | tuple[int | float] = None,
-           r: float = 1,
-           label: str = None):
-    """
-    Draw a circle
-    :param center - center of the circle
-    :param r - radius of the circle
-    :label - optional label of the circle
-    """
-    return Circle(_scene, center=center, r=r, label=label)
-
-
-@on_scene
 def circle_from_three_points(p1: str | Point | tuple[float, float],
                              p2: str | Point | tuple[float, float],
                              p3: str | Point | tuple[float, float],
@@ -481,7 +468,16 @@ def triangle_center(p1: str | Point | tuple[int | float, int | float],
     p2 = to_point(_scene, p2)
     p3 = to_point(_scene, p3)
 
-    return Point(_scene, name=pointName, get_position=tr.get_circumscribed_pos_r(p1, p2, p3))
+    return Point(_scene, name=pointName, get_position=tr.get_circumscribed_pos_r(p1, p2, p3)[0])
+
+
+@on_scene
+def triangle_orthocenter(triangle: str | Triangle,
+                         label: str = None):
+    triangle = to_figure(triangle)
+
+    return Point(_scene, name=label,
+                 get_position=lambda: get_orthocenter(triangle.p1, triangle.p2, triangle.p3))
 
 
 @on_scene
@@ -591,15 +587,14 @@ def inscribed_circle(triangle: str | Triangle,
     return Circle(_scene, center=center,
                   get_r=lambda: incenter_and_inradius(triangle.p1, triangle.p2, triangle.p3)[1], label=circle_label)
 
+
 @on_scene
 def inscribed_circle_center(triangle: str | Triangle,
-                     label: str = None):
-
+                            label: str = None):
     triangle = to_figure(triangle)
 
     return Point(_scene, name=label,
-                   get_position=lambda: incenter_and_inradius(triangle.p1, triangle.p2, triangle.p3)[0])
-
+                 get_position=lambda: incenter_and_inradius(triangle.p1, triangle.p2, triangle.p3)[0])
 
 
 @on_scene

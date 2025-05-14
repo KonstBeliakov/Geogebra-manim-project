@@ -267,3 +267,35 @@ def arc_midpoint_pos(p1, p2, circle):
     my = cy + r * math.sin(mid_angle)
 
     return mx, my
+
+
+def get_orthocenter(p1: Point, p2: Point, p3: Point) -> (float, float):
+    """
+    Return the orthocenter (Hx, Hy) of triangle p1, p2, p3.
+    Raises ValueError if the points are collinear (no unique orthocenter).
+    """
+    x1, y1 = p1.x, p1.y
+    x2, y2 = p2.x, p2.y
+    x3, y3 = p3.x, p3.y
+
+    # Compute the same D and circumcenter U = (Ux, Uy) as in your function
+    D = 2 * (x1*(y2 - y3) + x2*(y3 - y1) + x3*(y1 - y2))
+    if abs(D) < 1e-9:
+        raise ValueError(
+            f"Triangle {p1}, {p2}, {p3} is degenerate or the points are collinear; "
+            "no unique orthocenter."
+        )
+
+    Ux = ((x1**2 + y1**2)*(y2 - y3) +
+          (x2**2 + y2**2)*(y3 - y1) +
+          (x3**2 + y3**2)*(y1 - y2)) / D
+
+    Uy = ((x1**2 + y1**2)*(x3 - x2) +
+          (x2**2 + y2**2)*(x1 - x3) +
+          (x3**2 + y3**2)*(x2 - x1)) / D
+
+    # Orthocenter H = A + B + C - 2*O
+    Hx = x1 + x2 + x3 - 2 * Ux
+    Hy = y1 + y2 + y3 - 2 * Uy
+
+    return Hx, Hy

@@ -69,10 +69,13 @@ def parse(ggb_file):
                 element = root[it]
                 if element.tag == "element":
                     label = element.get("label").replace("'", "\\'")
+                    element_type = element.get('type')
                     if label in used:
+                        if element_type == 'point':
+                            info = parse_point(element)
+                            procces_label_for_point(info)
                         continue
                     used[label] = True
-                    element_type = element.get('type')
                     if element_type == 'point':
                         info = parse_point(element)
                         operations.append(f"point('{label}', {info['x']}, {info['y']}, label_x={info['x_offset']}, label_y={info['y_offset']}, show_label={info['show_label']})")
@@ -102,11 +105,8 @@ def parse(ggb_file):
                     elif command_name == 'Midpoint':
                         a, b = inputs.get('a0'), inputs.get('a1')
                         label = outputs.get('a0')
-                        info = parse_point(root[it+1])
                         used[label] = True
                         operations.append(f"midPoint('{a}', '{b}', '{label}')")
-                        procces_label_for_point(info)
-                        it += 1
                         continue
 
                     elif command_name == 'Polygon':
@@ -126,16 +126,13 @@ def parse(ggb_file):
 
                     elif command_name == 'Intersect':
                         a, b, index_str = inputs.get('a0'), inputs.get('a1'), inputs.get('a2')
-                        labels = tuple(outputs.get(f"a{i}") for i in range(len(outputs.attrib)))
+                        labels = (outputs.get("a0"), outputs.get("a1"))
+                        if len(labels) == 1:
+                            labels = tuple(labels[0], None)
                         for label in labels:
-                            used[label] = True
-                        intersection_result_type = root[it+1].get('type')
+                            if label:
+                                used[label] = True
                         operations.append(f"intersect_figures('{a}', '{b}', {labels})")
-                        if intersection_result_type == 'point':
-                            info = parse_point(root[it+1])
-                            procces_label_for_point(info)
-                            it += 1
-                            continue
 
                     elif command_name == "Circle":
                         center = inputs.get("a0")
@@ -161,43 +158,41 @@ def parse(ggb_file):
                             triangle_heights[str] = []
                         triangle_heights[str].append(f'{a + d}')
                         used[d] = True
-                        info = parse_point(root[it+1])
-                        procces_label_for_point(info)
-                        it += 1
                         continue
+
+                    elif command_name == "Median":
+                        a, b, c = inputs.get('a0'), inputs.get('a1'), inputs.get('a2')
+                        point_name, x, y, median_name = outputs.get('a0'), outputs.get('a1'), outputs.get('a2'), outputs.get('a3')
+                        used[point_name] = used[x] = used[y] = used[median_name] = True
+                        operations.append(f"median('{a + b + c}', '{a + point_name}')")
+
+                    elif command_name == "Bisector":
+                        a, b, c = inputs.get('a0'), inputs.get('a1'), inputs.get('a2')
+                        point_name, x, y, median_name = outputs.get('a0'), outputs.get('a1'), outputs.get('a2'), outputs.get('a3')
+                        used[point_name] = used[x] = used[y] = used[median_name] = True
+                        operations.append(f"bisector('{a + b + c}', '{a + point_name}')")
 
                     elif command_name == "TriangleCenter":
                         a, b, c, center_type = inputs.get('a0'), inputs.get('a1'), inputs.get('a2'), inputs.get('a3')
                         label = outputs.get('a0')
                         if center_type == "1":
+                            continue
                             operations.append(f"inscribed_circle_center('{triangle_short_name[a + b + c]}', '{label}')")
                             used[label] = True
-                            info = parse_point(root[it+1])
-                            procces_label_for_point(info)
-                            it += 1
                             continue
 
+                        if center_type == "4":
+                            operations.append(f"triangle_orthocenter('{triangle_short_name[a + b + c]}', '{label}')")
+                            used[label] = True
+                            continue
                         if center_type != "4":  # todo
                             continue
-                        used[label] = True
-                        abc = [a, b, c]
-                        abc.sort()
-                        str = ''.join(abc)
-                        segments = triangle_heights.get(str)
-                        operations.append(f"intersect_figures('{segments[0]}', '{segments[1]}', ('{label}'))")
-                        info = parse_point(root[it+1])
-                        procces_label_for_point(info)
-                        it += 1
-                        continue
 
                     elif command_name == "Mirror":
                         a, b = inputs.get('a0'), inputs.get('a1')
                         label = outputs.get('a0')
                         used[label] = True
                         operations.append(f"reflect_point_about_line('{a}', '{b}', '{label}')")
-                        info = parse_point(root[it + 1])
-                        procces_label_for_point(info)
-                        it += 1
                         continue
 
                     elif command_name == "Incircle":
