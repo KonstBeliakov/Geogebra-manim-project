@@ -24,12 +24,47 @@ def get_coordinates(ggb_file):
 
             return coordinates
 
+def parse_global_info(tree):
+    root = tree.getroot()
+
+    ev = root.find(".//euclidianView")
+    size = ev.find("size")
+    width = float(size.get("width"))
+    height = float(size.get("height"))
+
+    cs = ev.find("coordSystem")
+
+    scaleX = float(cs.get("scale"))
+    scaleY = float(cs.get("yscale"))
+
+    xZero  = float(cs.get("xZero"))
+    yZero  = float(cs.get("yZero"))
+
+    return {
+            "width": width, "height": height,
+            "scaleX": scaleX, "scaleY": scaleY,
+            "xZero": xZero, "yZero": yZero
+    }
+
+def compute_screen_coords(view, x_geo, y_geo):
+    """
+    GeoGebra maps math‐coords (x_geo,y_geo) to screen pixels by:
+      x_screen = xZero + x_geo * scaleX
+      y_screen = yZero - y_geo * scaleY
+    (screen‐y grows DOWN, so we subtract)
+    """
+    x_s = view["xZero"] + x_geo * view["scaleX"]
+    y_s = view["yZero"] - y_geo * view["scaleY"]
+    return x_s, y_s
 
 def parse(ggb_file):
     with zipfile.ZipFile(ggb_file, 'r') as z:
         with z.open('geogebra.xml') as xml_file:
             tree = ET.parse(xml_file)
             root = tree.getroot().find("construction")
+
+            view = parse_global_info(tree)
+
 
             operations = []
             used = {}
@@ -44,19 +79,26 @@ def parse(ggb_file):
 
                 x, y, z = float(coords.get("x")), float(coords.get("y")), float(coords.get("z"))
 
+                x /= z
+                y /= z
+
                 show_label = show.get("label") == "true"
-                x_offset, y_offset = None, None
+                x_geo_lab, y_geo_lab = None, None
                 if label_offset is not None:
                     x_offset, y_offset = float(label_offset.get("x")), float(label_offset.get("y"))
-
+                    x_s, y_s = compute_screen_coords(view, x, y)
+                    x_label = x_s + x_offset
+                    y_label = y_s + y_offset
+                    x_geo_lab = (x_label - view["xZero"]) / view["scaleX"]
+                    y_geo_lab = (view["yZero"] - y_label) / view["scaleY"]
 
                 return {
                     "label" : label,
-                    "x" : x / z,
-                    "y" : y / z,
+                    "x" : x,
+                    "y" : y,
                     "show_label": show_label,
-                    "x_offset": x_offset,
-                    "y_offset": y_offset,
+                    "x_offset": x_geo_lab,
+                    "y_offset": y_geo_lab,
                 }
 
             def procces_label_for_point(info):
