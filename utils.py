@@ -649,7 +649,7 @@ def point_on_circle(circle: str | Circle, pointName=None):
 
 
 @on_scene
-def move_points(points, positions, scale_factor, run_time=2):
+def move_points(points, positions, run_time=2):
     """
     Animate multiple points to new positions
     :param points – list of points
@@ -659,8 +659,6 @@ def move_points(points, positions, scale_factor, run_time=2):
     _scene.play(
         *[point.x_tracker.animate.set_value(new_x) for point, (new_x, _) in zip(points, positions)],
         *[point.y_tracker.animate.set_value(new_y) for point, (_, new_y) in zip(points, positions)],
-        *[point.label_dx.animate.set_value(point.label_dx.get() * scale_factor) for point in points],
-        *[point.label_dy.animate.set_value(point.label_dx.get() * scale_factor) for point in points],
         run_time=run_time
     )
 
@@ -732,8 +730,7 @@ def recenter_camera(point_cords=None, run_time=2):
 
     if points:
         move_points(points, [new_position(point.x, point.y) for point in points],
-                    run_time=run_time,
-                    scale_factor=scale_factor)
+                    run_time=run_time)
 
 
 @on_scene

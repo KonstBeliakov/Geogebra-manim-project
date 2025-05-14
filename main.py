@@ -238,8 +238,8 @@ def example17(scene):
 
 
 def example18(scene):
-    A = point('A', 0, 0, label_x=0.2, label_y=0.2)
-    B = point('B', 1, 1, label_x=0.3, label_y=0)
+    A = point('A', 0, 0, label_x=50, label_y=30)
+    B = point('B', 1, 1, label_x=100, label_y=0)
 
     A.move(1, 0)
     B.move_label(0.2, 0.2, run_time=1)

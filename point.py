@@ -114,7 +114,9 @@ class Point:
         self.render()
 
     def update_label_position(self):
-        self.label_position = lambda: (self.x + self.label_dx.get_value(), self.y + self.label_dy.get_value(), 0)
+        self.label_position = lambda: (self.x + self.label_dx.get_value() * settings.label_position_scaling_factor,
+                                       self.y + self.label_dy.get_value() * settings.label_position_scaling_factor,
+                                       0)
 
     def move_label_to(self, label_dx, label_dy, run_time=0):
         self.update_label_position()
