@@ -239,7 +239,7 @@ def example17(scene):
 
 def example18(scene):
     A = point('A', 0, 0, label_x=0.2, label_y=0.2)
-    B = point('B', 1, 1, label_x=1.3, label_y=1)
+    B = point('B', 1, 1, label_x=0.3, label_y=0)
 
     A.move(1, 0)
     B.move_label(0.2, 0.2, run_time=1)
@@ -291,7 +291,7 @@ def example22(scene):
     c = circle((0, 0), 1)
     points(('A', -1, 1), ('B', 1, 1))
     s = segment('A', 'B')
-    intersect_figures(s, c, pointNames=('X', 'Y'))
+    intersect_figures(s, c, pointNames=('X', ))
     scene.wait(1)
 
 
@@ -299,4 +299,4 @@ class Main(Scene):
     def construct(self):
         init(scene=self)
 
-        example22(self)
+        example18(self)

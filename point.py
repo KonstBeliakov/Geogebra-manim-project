@@ -99,8 +99,8 @@ class Point:
         if name in valid_point_names:
             valid_point_names.remove(name)
 
-        self.label_dx = ValueTracker(default_label_offset_x)
-        self.label_dy = ValueTracker(default_label_offset_y)
+        self.label_dx = ValueTracker(default_label_offset_x if label_x is None else label_y)
+        self.label_dy = ValueTracker(default_label_offset_y if label_y is None else label_y)
 
         self.update_label_position()
 
@@ -109,8 +109,6 @@ class Point:
         else:
             self.show_label = show_label
 
-        self.move_label_to(label_x, label_y)
-
         self._show_point = show_point
 
         self.render()
@@ -118,31 +116,22 @@ class Point:
     def update_label_position(self):
         self.label_position = lambda: (self.x + self.label_dx.get_value(), self.y + self.label_dy.get_value(), 0)
 
-    def move_label_to(self, label_x=None, label_y=None, run_time=0):
-        if label_x is not None:
-            target_dx = label_x - self.x
-        else:
-            target_dx = self.label_dx.get_value()
-        if label_y is not None:
-            target_dy = label_y - self.y
-        else:
-            target_dy = self.label_dy.get_value()
-
+    def move_label_to(self, label_dx, label_dy, run_time=0):
         self.update_label_position()
 
         if run_time:
             self.scene.play(
-                self.label_dx.animate.set_value(target_dx),
-                self.label_dy.animate.set_value(target_dy),
+                self.label_dx.animate.set_value(label_dx),
+                self.label_dy.animate.set_value(label_dy),
                 run_time=run_time
             )
         else:
-            self.label_dx.set_value(target_dx)
-            self.label_dy.set_value(target_dy)
+            self.label_dx.set_value(label_dx)
+            self.label_dy.set_value(label_dy)
 
     def move_label(self, dx=0, dy=0, run_time=0):
-        self.move_label_to(label_x=self.x + self.label_dx.get_value() + dx,
-                           label_y=self.y + self.label_dy.get_value() + dy,
+        self.move_label_to(label_dx=self.label_dx.get_value() + dx,
+                           label_dy=self.label_dy.get_value() + dy,
                            run_time=run_time)
 
     @property
