@@ -83,29 +83,33 @@ def parse(ggb_file):
                 y /= z
 
                 show_label = show.get("label") == "true"
-                x_geo_lab, y_geo_lab = None, None
+                x_offset, y_offset = None, None
                 if label_offset is not None:
                     x_offset, y_offset = float(label_offset.get("x")), float(label_offset.get("y"))
-                    x_s, y_s = compute_screen_coords(view, x, y)
-                    x_label = x_s + x_offset
-                    y_label = y_s + y_offset
-                    x_geo_lab = (x_label - view["xZero"]) / view["scaleX"]
-                    y_geo_lab = (view["yZero"] - y_label) / view["scaleY"]
+                    #x_offset /= view["scaleX"]
+                    #y_offset /= -view["scaleY"]
+                    #x_s, y_s = compute_screen_coords(view, x, y)
+                    #x_label = x_s + x_offset
+                    #y_label = y_s + y_offset
+                    #x_manim = (x_label - view["xZero"]) / view["scaleX"]
+                    #y_manim = (view["yZero"] - y_label) / view["scaleY"]
+                    #x_geo_lab = (x_label - view["xZero"]) / view["scaleX"]
+                    #y_geo_lab = (view["yZero"] - y_label) / view["scaleY"]
 
                 return {
                     "label" : label,
                     "x" : x,
                     "y" : y,
                     "show_label": show_label,
-                    "x_offset": x_geo_lab,
-                    "y_offset": y_geo_lab,
+                    "x_offset": x_offset,
+                    "y_offset": y_offset,
                 }
 
             def procces_label_for_point(info):
-                if info['show_label']:
-                    operations.append(f"show_label('{info['label']}')")
                 if info['x_offset'] or info['y_offset']:
                     operations.append(f"move_label('{info['label']}', {info['x_offset']}, {info['y_offset']})")
+                if info['show_label']:
+                    operations.append(f"show_label('{info['label']}')")
 
             for it in range(len(root)):
                 element = root[it]
