@@ -189,7 +189,7 @@ def segment_circle_intersection_positions(segment, circle):
             intersections.append((xi, yi))
 
     #if (len(intersections) == 1 or
-    if math.dist(intersections[0], intersections[1]) < 10 ** -9:
+    if math.dist(intersections[0], intersections[1]) < 10 ** -6:
         intersections[1] = None
 
     return intersections
