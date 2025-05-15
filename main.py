@@ -308,8 +308,21 @@ def example23(scene):
     scene.wait(1)
 
 
+def example24(scene):
+    t1 = triangle('ABC', label='t1')
+    b = bisector('ABC', 'BM', label='b')
+    c = median('ABC', 'CX', label='c')
+    h = height('ABC', 'AH', label='h')
+    print(b)
+    print(b.label)
+    intersect_figures('b', 'c', 'N')
+    intersect_figures('b', 'h', 'L')
+    scene.wait()
+
+
+
 class Main(Scene):
     def construct(self):
         init(scene=self)
 
-        example23(self)
+        example24(self)
