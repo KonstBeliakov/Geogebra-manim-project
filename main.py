@@ -288,15 +288,41 @@ def example21(scene):
 
 
 def example22(scene):
+    settings.show_circle_centers = False
     c = circle((0, 0), 1)
     points(('A', -1, 1), ('B', 1, 1))
     s = segment('A', 'B')
-    intersect_figures(s, c, pointNames=('X', ))
+    intersect_figures(s, c, pointNames=('X', 'Y'))
     scene.wait(1)
+
+
+def example23(scene):
+    t1 = triangle('ABC', label='t1')
+    settings.show_circle_centers = False
+    c = inscribed_circle('t1', pointName='O', circle_label='w1')
+    scene.wait(1)
+
+    t2 = triangle('DEF', label='t2')
+    #settings.show_circle_centers = False
+    c = circumscribed_circle('t2', center_name='P', circle_label='w2')
+    scene.wait(1)
+
+
+def example24(scene):
+    t1 = triangle('ABC', label='t1')
+    b = bisector('ABC', 'BM', label='b')
+    c = median('ABC', 'CX', label='c')
+    h = height('ABC', 'AH', label='h')
+    print(b)
+    print(b.label)
+    intersect_figures('b', 'c', 'N')
+    intersect_figures('b', 'h', 'L')
+    scene.wait()
+
 
 
 class Main(Scene):
     def construct(self):
         init(scene=self)
 
-        example18(self)
+        example24(self)

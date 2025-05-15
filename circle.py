@@ -29,6 +29,7 @@ class Circle(Figure):
         """
         self.scene = scene
         self.center = to_point(scene, center, show_point=settings.show_circle_centers)
+        print('center of circle: ', self.center.name, self.center.show_label, self.center.show_point)
         self._get_radius = get_r
 
         if self._get_radius is None:
@@ -61,6 +62,11 @@ class Circle(Figure):
 
     def render(self):
         # Create the circle with initial values.
+        if settings.show_circle_centers:
+            self.center.show_point = True
+            if settings.show_point_labels:
+                self.center.show_label = True
+
         circle = manim.Circle(
             radius=self.r,
             color=LINES_COLOR,

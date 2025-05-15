@@ -104,12 +104,11 @@ class Point:
 
         self.update_label_position()
 
-        if show_label is None:
-            self.show_label = settings.show_point_labels
-        else:
-            self.show_label = show_label
+        self.show_label = settings.show_point_labels if show_label is None else show_label
 
-        self._show_point = show_point
+        self.show_point = show_point
+
+        print(self.name, self.show_label, self.show_point)
 
         self.render()
 

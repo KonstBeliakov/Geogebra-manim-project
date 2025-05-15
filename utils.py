@@ -44,7 +44,7 @@ def on_scene(func):
     return wrapper
 
 
-def prepare_segment(scene, triangle: str, segment_name: str, point_builder):
+def prepare_segment(scene, triangle: str, segment_name: str, point_builder, label=None):
     """
     Auxiliary function to prepare a segment within a triangle.
 
@@ -84,11 +84,11 @@ def prepare_segment(scene, triangle: str, segment_name: str, point_builder):
     A, B = [get_point_by_name(i) for i in triangle if i not in segment_name]
 
     p2 = point_builder(scene, p1, A, B, segment_name[1])
-    Segment(scene, p1, p2)
+    return Segment(scene, p1, p2, label=label)
 
 
 @on_scene
-def median(triangle: str, segment_name: str) -> Point:
+def median(triangle: str, segment_name: str, label: str = None) -> Point:
     """
     Draw the **median** from a vertex of *triangle*.
 
@@ -105,11 +105,11 @@ def median(triangle: str, segment_name: str) -> Point:
     def midpoint_builder(scene, p1, A, B, name):
         return midPoint(A, B, name=name)
 
-    return prepare_segment(_scene, triangle, segment_name, midpoint_builder)
+    return prepare_segment(_scene, triangle, segment_name, midpoint_builder, label=label)
 
 
 @on_scene
-def bisector(triangle: str, segment_name: str):
+def bisector(triangle: str, segment_name: str, label: str = None):
     """
     Draw an **internal angle-bisector** from a vertex of *triangle*.
 
@@ -121,11 +121,11 @@ def bisector(triangle: str, segment_name: str):
     def bisector_builder(scene, p1, A, B, name):
         return Point(scene, name=name, get_position=lambda: get_bisector_position(p1, A, B))
 
-    return prepare_segment(_scene, triangle, segment_name, bisector_builder)
+    return prepare_segment(_scene, triangle, segment_name, bisector_builder, label=label)
 
 
 @on_scene
-def height(triangle: str, segment_name: str):
+def height(triangle: str, segment_name: str, label: str = None):
     """
     Draw an **altitude (height)** from a vertex of *triangle*.
 
@@ -137,7 +137,7 @@ def height(triangle: str, segment_name: str):
     def altitude_builder(scene, p1, A, B, name):
         return Point(scene, name=name, get_position=lambda: get_altitude_position(p1, A, B))
 
-    return prepare_segment(_scene, triangle, segment_name, altitude_builder)
+    return prepare_segment(_scene, triangle, segment_name, altitude_builder, label=label)
 
 
 @on_scene
@@ -311,10 +311,10 @@ def circle(center: Point | str | tuple[int | float] = None,
 
 @on_scene
 def circle_from_two_points(center: str | Point | tuple[float, float],
-                             p: str | Point | tuple[float, float],
-                             label: str = None):
-
+                           p: str | Point | tuple[float, float],
+                           label: str = None):
     return Circle.from_two_points(_scene, center, p, label)
+
 
 @on_scene
 def circle_from_three_points(p1: str | Point | tuple[float, float],
@@ -505,7 +505,7 @@ def triangle_orthocenter(triangle: str | Triangle,
 
 @on_scene
 def triangle_centroid(triangle: str | Triangle,
-                         label: str = None):
+                      label: str = None):
     triangle = to_figure(triangle)
 
     return Point(_scene, name=label,
@@ -614,7 +614,8 @@ def inscribed_circle(triangle: str | Triangle,
     triangle = to_figure(triangle)
 
     center = Point(_scene, name=pointName,
-                   get_position=lambda: incenter_and_inradius(triangle.p1, triangle.p2, triangle.p3)[0])
+                   get_position=lambda: incenter_and_inradius(triangle.p1, triangle.p2, triangle.p3)[0],
+                   show_point=False)
 
     return Circle(_scene, center=center,
                   get_r=lambda: incenter_and_inradius(triangle.p1, triangle.p2, triangle.p3)[1], label=circle_label)
