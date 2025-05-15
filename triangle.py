@@ -51,7 +51,8 @@ class Triangle(Figure):
         """
 
         center = Point(self.scene, name=point_name,
-                       get_position=lambda: get_circumscribed_pos_r(self.p1, self.p2, self.p3)[0])
+                       get_position=lambda: get_circumscribed_pos_r(self.p1, self.p2, self.p3)[0],
+                       show_point=False)
 
         circ_circle = circle.Circle(self.scene, center,
                                     get_r=lambda: get_circumscribed_pos_r(self.p1, self.p2, self.p3)[1],
