@@ -63,11 +63,11 @@ class Segment(Figure):
             t = ((x1 - x3) * (y3 - y4) - (y1 - y3) * (x3 - x4)) / denom
             u = ((x1 - x3) * (y1 - y2) - (y1 - y3) * (x1 - x2)) / denom
 
-            if 0 <= t <= 1 and 0 <= u <= 1:
-                intersect_x = x1 + t * (x2 - x1)
-                intersect_y = y1 + t * (y2 - y1)
-                return intersect_x, intersect_y
-            else:
-                return None
+            #if 0 <= t <= 1 and 0 <= u <= 1:
+            intersect_x = x1 + t * (x2 - x1)
+            intersect_y = y1 + t * (y2 - y1)
+            return intersect_x, intersect_y
+            #else:
+            #    return None
 
         return Point(self.scene, pointName, get_position=lambda: get_position(self, other))

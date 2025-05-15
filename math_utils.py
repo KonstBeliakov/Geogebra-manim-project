@@ -183,11 +183,12 @@ def segment_circle_intersection_positions(segment, circle):
 
         # Check if the intersection points lie on the segment (t in the range [0,1])
         for t in [t1, t2]:
-            if 0 <= t <= 1:
-                xi = x1 + t * dx
-                yi = y1 + t * dy
-                intersections.append((xi, yi))
+            #if 0 <= t <= 1:
+            xi = x1 + t * dx
+            yi = y1 + t * dy
+            intersections.append((xi, yi))
 
+    #if (len(intersections) == 1 or
     if math.dist(intersections[0], intersections[1]) < 10 ** -9:
         intersections[1] = None
 

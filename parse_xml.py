@@ -85,7 +85,7 @@ def parse(ggb_file):
                 show_label = show.get("label") == "true"
                 x_offset, y_offset = None, None
                 if label_offset is not None:
-                    x_offset, y_offset = float(label_offset.get("x")), float(label_offset.get("y"))
+                    x_offset, y_offset = float(label_offset.get("x")), -float(label_offset.get("y"))
                     #x_offset /= view["scaleX"]
                     #y_offset /= -view["scaleY"]
                     #x_s, y_s = compute_screen_coords(view, x, y)
