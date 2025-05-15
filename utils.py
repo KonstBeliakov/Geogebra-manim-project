@@ -264,7 +264,7 @@ def reflect_point_about_line(
 
 @on_scene
 def reflect_figure_about_line(
-        figure: Figure | str,
+        figure: Figure | str | Point,
         reflection_line: str | Segment,
         new_figure_label: str = None
 ) -> Figure:
@@ -297,6 +297,31 @@ def reflect_figure_about_line(
             p3=new_p3,
             label=new_figure_label
         )
+    if isinstance(figure, Point):
+        return reflect_point_about_line(figure, line_segment, name=new_figure_label)
+
+
+@on_scene
+def reflect(figure1: Figure | Point | str,
+            figure2: Segment | Point | str,
+            new_figure_label:str=None) -> Figure | Point:
+    """
+    Reflect a figure or a point about a segment(line) or a point
+
+    :param figure1: The figure to reflect.
+    :param figure2: Can be a Segment, a Point, or a string representation of a Segment or a Point.
+
+    :returns The reflected figure or point
+    """
+    figure1 = to_figure(figure1)
+    figure2 = to_figure(figure2)
+
+    if isinstance(figure2, Point):
+        return reflect_figure_about_point(figure1, figure2, new_figure_label=new_figure_label)
+    elif isinstance(figure2, Segment):
+        return reflect_figure_about_line(figure1, figure2, new_figure_label=new_figure_label)
+    else:
+        raise TypeError('figure2 should be a Point or a segment!')
 
 
 @on_scene

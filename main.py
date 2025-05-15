@@ -328,8 +328,44 @@ def example25(scene):
     scene.wait(1)
 
 
+def example26(scene):  # reflecting example
+    settings.show_point_labels = True
+    # Reflect point about another point
+    point('P', 2, 1)
+    point('Q', 3, 2)
+    reflect('P', 'Q', 'P\'')
+
+    # Reflect circle about a point
+    point('A', 1, 2)
+    circle('A', 1.5, 'circle_1')
+    reflect('circle_1', 'P', 'circle1\'')
+
+    # Reflect triangle about a point
+    points(('B', 0, 0), ('C', 1, 0), ('D', 0, 1))
+    triangle('BCD', 'triangle_1')
+    reflect('triangle_1', 'P', 'triangle_1\'')
+
+    # Reflect point about a line segment
+    points(('E', 1, 1), ('F', -1, -1))
+    segment('E', 'F', 'segment_1')
+    point('R', 0, 2)
+    reflect('R', 'segment_1', 'R\'')
+
+    # Reflect circle about a line segment
+    point('G', 2, 2)
+    circle('G', 1.5, 'circle_2')
+    reflect_figure_about_line('circle_2', 'segment_1', 'circle_2_reflected')
+
+    # Reflect triangle about a line segment
+    points(('H', -1, -1), ('I', 0, -1), ('J', 1, 0))
+    triangle('HIJ', 'triangle_2')
+    reflect_figure_about_line('triangle_2', 'segment_1', 'triangle_2_reflected')
+
+    scene.wait(5)
+
+
 class Main(Scene):
     def construct(self):
         init(scene=self)
 
-        example25(self)
+        example26(self)
