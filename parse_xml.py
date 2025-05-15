@@ -241,7 +241,7 @@ def parse(ggb_file):
                         a, b = inputs.get('a0'), inputs.get('a1')
                         label = outputs.get('a0')
                         used[label] = True
-                        operations.append(f"reflect_point_about_line('{a}', '{b}', '{label}')")
+                        operations.append(f"reflect('{a}', '{b}', '{label}')")
                         continue
 
                     elif command_name == "Incircle":

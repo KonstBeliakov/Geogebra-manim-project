@@ -171,10 +171,12 @@ def segment_circle_intersection_positions(segment, circle):
 
     intersections = []
 
-    if discriminant < 0:
+    if discriminant < -10 ** -9:
         # No real roots - the segment and the circle do not intersect
         return [None, None]
     else:
+        if -10 ** -9 < discriminant < 0:
+            discriminant = 0
         # Find the roots of the quadratic equation
         sqrt_disc = math.sqrt(discriminant)
         # t1 must be < t2
