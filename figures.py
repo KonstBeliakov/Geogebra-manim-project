@@ -1,7 +1,7 @@
 from random import choice
 from abc import ABC, abstractmethod
 
-from point import point_names
+from point import point_names, Point
 
 valid_figure_labels = [chr(i) for i in range(ord('a'), ord('z') + 1)]
 user_figure_labels = []
@@ -56,7 +56,7 @@ def _segment_from_points(points: str | tuple[str, str] | list[str, str]):
     return None
 
 
-def to_figure(figure: str | Figure):
+def to_figure(figure: str | Figure | Point) -> Figure | Point:
     if isinstance(figure, str):
         if figure in figure_names:
             return figure_names[figure]
@@ -66,7 +66,9 @@ def to_figure(figure: str | Figure):
 
         if segment:
             return segment
-        raise ValueError(f'There is no such figure with label "{figure}" or a segment with such points.')
-    if isinstance(figure, Figure):
+        if figure in point_names:
+            return point_names[figure]
+        raise ValueError(f'There is no such figure with label "{figure}" or a segment with such points or a point with this name.')
+    if isinstance(figure, Figure | Point):
         return figure
     raise TypeError(f'Can\'t transform type {type(figure)} to Figure.')

@@ -191,7 +191,7 @@ def mirror_point(
 
 @on_scene
 def reflect_figure_about_point(
-        figure: str | Figure,
+        figure: str | Figure | Point,
         reflection_center: str | Point | tuple,
         new_figure_label: str = None
 ) -> Figure:
@@ -225,6 +225,8 @@ def reflect_figure_about_point(
             p3=new_p3,
             label=new_figure_label
         )
+    if isinstance(figure, Point):
+        return mirror_point(figure, center, name=new_figure_label)
 
 
 @on_scene

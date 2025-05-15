@@ -320,9 +320,16 @@ def example24(scene):
     scene.wait()
 
 
+def example25(scene):
+    settings.show_point_labels = True
+    a = point('A', 1, 0)
+    b = point('B', 0, 0)
+    reflect_figure_about_point('A', 'B', 'C')
+    scene.wait(1)
+
 
 class Main(Scene):
     def construct(self):
         init(scene=self)
 
-        example24(self)
+        example25(self)
