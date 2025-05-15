@@ -208,6 +208,7 @@ def reflect_figure_about_point(
             _scene,
             center=new_center,
             get_r=figure._get_radius,
+            r=figure.r_tracker.get_value(),
             label=new_figure_label
         )
     if isinstance(figure, Segment):
@@ -281,7 +282,11 @@ def reflect_figure_about_line(
 
     if isinstance(figure, Circle):
         new_center = reflect_point_about_line(figure.center, line_segment)
-        return Circle(_scene, center=new_center, get_r=figure._get_radius, label=new_figure_label)
+        return Circle(_scene,
+                      center=new_center,
+                      get_r=figure._get_radius,
+                      r=figure.r_tracker.get_value(),
+                      label=new_figure_label)
     if isinstance(figure, Segment):
         new_p1 = reflect_point_about_line(figure.p1, line_segment)
         new_p2 = reflect_point_about_line(figure.p2, line_segment)
