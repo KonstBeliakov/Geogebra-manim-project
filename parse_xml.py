@@ -211,15 +211,15 @@ def parse(ggb_file):
 
                     elif command_name == "Median":
                         a, b, c = inputs.get('a0'), inputs.get('a1'), inputs.get('a2')
-                        point_name, x, y, median_name = outputs.get('a0'), outputs.get('a1'), outputs.get('a2'), outputs.get('a3')
+                        point_name, median_name, x, y = outputs.get('a0'), outputs.get('a1'), outputs.get('a2'), outputs.get('a3')
                         used[point_name] = used[x] = used[y] = used[median_name] = True
-                        operations.append(f"median('{a + b + c}', '{a + point_name}')")
+                        operations.append(f"median('{a + b + c}', '{a + point_name}', '{median_name}')")
 
                     elif command_name == "Bisector":
                         a, b, c = inputs.get('a0'), inputs.get('a1'), inputs.get('a2')
-                        point_name, x, y, median_name = outputs.get('a0'), outputs.get('a1'), outputs.get('a2'), outputs.get('a3')
+                        point_name, median_name, x, y = outputs.get('a0'), outputs.get('a1'), outputs.get('a2'), outputs.get('a3')
                         used[point_name] = used[x] = used[y] = used[median_name] = True
-                        operations.append(f"bisector('{a + b + c}', '{a + point_name}')")
+                        operations.append(f"bisector('{a + b + c}', '{a + point_name}', '{median_name}')")
 
                     elif command_name == "TriangleCenter":
                         a, b, c, center_type = inputs.get('a0'), inputs.get('a1'), inputs.get('a2'), inputs.get('a3')

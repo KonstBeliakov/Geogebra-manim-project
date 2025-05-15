@@ -17,7 +17,9 @@ from arcmark import ArcMark
 from triangle import Triangle
 
 
-def midPoint(p1: Point, p2: Point, name=None):
+def midPoint(p1: Point | str, p2: Point | str, name=None):
+    p1 = to_point(_scene, p1)
+    p2 = to_point(_scene, p2)
     return Point(_scene, get_position=lambda: ((p1.x + p2.x) / 2, (p1.y + p2.y) / 2), name=name)
 
 
